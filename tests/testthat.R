@@ -1,4 +1,4 @@
 library(testthat)
-library(hpc)
+library(clairvoyant)
 
-test_check("hpc")
+test_check("clairvoyant")

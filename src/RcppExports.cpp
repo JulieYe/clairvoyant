@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // timesTwo
 int timesTwo(int x);
-RcppExport SEXP hpc_timesTwo(SEXP xSEXP) {
+RcppExport SEXP clairvoyant_timesTwo(SEXP xSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
