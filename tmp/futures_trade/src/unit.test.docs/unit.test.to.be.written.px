@@ -1,0 +1,11 @@
+Mostly make sure numTicks_ describes the interger of tickSize_ / rawPx_.
+
+1. Test copy constructor, assignment operator.
+
+2. Test setPx, setTickSize methods so that numTicks_ is changed accordingly.
+
+3. Create a huge vector of Px's and tested the comparison methods using sort algorithm.
+
+4. Test rounding.
+
+5. Test overloaded operators + and -.

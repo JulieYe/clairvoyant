@@ -1,0 +1,32 @@
+#CXX=/usr/bin/g++
+ROOTDIR = ..
+include $(ROOTDIR)/make.begin.mk
+include $(ROOTDIR)/make.env.mk
+
+BINDIR = ../bin
+OBJDIR = ../obj
+TMPDIR = ../tmp
+LIBDIR = ../lib
+COREDIR = ../core
+FEATUREDIR = ../feature
+ALPHADIR = ../alpha
+UTILSDIR = ../utils
+STRATEGYDIR = ../strategy
+APIDIR = ../api
+APICTPDIR = ../api/CTP
+APIZDDIR = ../api/ZD
+
+CPPFLAGS=$(CPPFLAGS_COMMON) -D$(SPFLAG) -D$(DFLAG) -D$(XFLAG) -D$(SAHFLAG) #-Wsign-conversion 
+LDFLAGS=$(LDFLAGS_COMMON) -L$(LIBDIR) -lSimulatorCoreStrategy -lSimulatorCore -lSimulatorCoreFeature -lSimulatorCoreAlpha -lSimulatorCoreApi -lSimulatorCoreCTPApi  -lSimulatorCoreZDMDApi -lSimulatorCoreUtils -I$(COREDIR) -I$(FEATUREDIR) -I$(ALPHADIR) -I$(UTILSDIR) -I$(APIDIR) -I$(APICTPDIR) -I$(STRATEGYDIR) -I$(APIZDDIR)
+LDFLAGSPROD= -L$(LIBDIR) -lSimulatorCoreStrategy -lSimulatorCore -lSimulatorCoreFeature -lSimulatorCoreAlpha -lSimulatorCoreApi -lSimulatorCoreCTPApi -lSimulatorCoreZDMDApi -lSimulatorCoreUtils -I$(COREDIR) -I$(FEATUREDIR) -I$(ALPHADIR) -I$(UTILSDIR) -I$(APIDIR) -I$(APICTPDIR) -I$(APIZDDIR) -I$(STRATEGYDIR) $(LDFLAGSPROD_COMMON) -L. -lthosttraderapi -lthostmduserapi -lzdqhapi -Wl,-rpath,.
+
+#LDFLAGS=-lrt -Wl,-rpath=/opt/gcc/gcc-4.7.0/lib64
+# LDFLAGS NOTE: -lrt needed for shm_open, etc. for boost interprocess.
+
+LIBS := $(foreach s,$(LIBS_BASE),$(OBJDIR)/$s)
+
+REBUILDABLES = $(LIBS) 
+
+ZDTrader : ZDTrader.cpp
+	$(CXX) -o $(BINDIR)/$@ $^ $(LDFLAGSPROD) $(CPPFLAGS)
+

@@ -1,0 +1,252 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (中国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\TestTrade.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""l.chs\\afxres.rc""          // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\TestTrade.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于 TestTrade"
+FONT 9, "宋体"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "TestTrade 1.0 版",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "版权所有 (C) 2011",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "确定",IDOK,178,7,50,14,WS_GROUP
+END
+
+IDD_TESTTRADE_DIALOG DIALOGEX 0, 0, 605, 241
+STYLE WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "TestTrade"
+FONT 9, "宋体"
+BEGIN
+    DEFPUSHBUTTON   "退出",IDOK,211,29,41,14
+    PUSHBUTTON      "登录",IDC_BTN_LOGIN,155,27,41,14
+    EDITTEXT        IDC_EDIT_INVESTORID,53,9,90,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PASSWORD,53,28,89,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "下单",IDC_BTN_ORDER,44,205,50,14
+    EDITTEXT        IDC_EDIT_PRICE,37,157,56,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FRONT_ID,165,69,88,12,ES_AUTOHSCROLL
+    LTEXT           "fid:",IDC_STATIC,143,72,17,8
+    EDITTEXT        IDC_EDIT_SESSION_ID,165,91,88,12,ES_AUTOHSCROLL
+    LTEXT           "sid:",IDC_STATIC,143,94,17,8
+    LTEXT           "oid:",IDC_STATIC,143,138,17,8
+    EDITTEXT        IDC_EDIT_ORDER_SYS_ID,165,135,88,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "撤单",IDC_BTN_ORDER_ACTION,173,159,50,14
+    LTEXT           "ref:",IDC_STATIC,143,116,17,8
+    EDITTEXT        IDC_EDIT_ORDER_REF,165,113,88,12,ES_AUTOHSCROLL
+    LTEXT           "用户代码:",IDC_STATIC,11,12,37,8
+    LTEXT           "交易密码:",IDC_STATIC,11,30,37,8
+    LTEXT           "价格:",IDC_STATIC,11,160,21,8
+    LTEXT           "合约:",IDC_STATIC,11,72,21,8
+    LTEXT           "买卖:",IDC_STATIC,11,94,21,8
+    COMBOBOX        IDC_COMBO_DIRECTION,37,91,88,65,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "开平:",IDC_STATIC,11,116,21,8
+    COMBOBOX        IDC_COMBO_OFFSET_FLAG,37,113,88,68,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "手数:",IDC_STATIC,11,138,21,8
+    EDITTEXT        IDC_EDIT_VOLUME,37,135,88,12,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_INSTRUMENTID,37,69,88,63,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LIST_INFO,386,7,212,227,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    CONTROL         "套保",IDC_CHECK_HEGE_FLAG,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,37,181,32,10
+    LTEXT           "套保:",IDC_STATIC,11,181,21,8
+    PUSHBUTTON      "清空日志",IDC_BTN_CLEAR_LOG,171,201,62,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,53,
+                    364,1
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,136,58,
+                    1,165
+    CONTROL         "市价",IDC_CHECK_ANY_PRICE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,96,159,29,8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,267,58,
+                    1,165
+    LTEXT           "合约:",IDC_STATIC,269,96,21,8
+    LTEXT           "市场:",IDC_STATIC,269,73,21,8
+    EDITTEXT        IDC_EDIT_FRONT_ID2,291,72,76,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_FRONT_ID3,291,93,76,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "订阅行情",IDC_BUTTON2,271,157,50,14
+    PUSHBUTTON      "退订",IDC_BUTTON3,272,189,50,14
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "TestTrade Microsoft 基础类应用程序\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "TestTrade\0"
+            VALUE "LegalCopyright", "版权所有 (C) 2011\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "TestTrade.EXE\0"
+            VALUE "ProductName", "TestTrade 应用程序\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_TESTTRADE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 598
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 234
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ABOUTBOX            "关于 TestTrade(&A)..."
+END
+
+#endif    // Chinese (中国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE 4, 2
+#pragma code_page(936)
+#endif //_WIN32
+#include "res\TestTrade.rc2"  // non-Microsoft Visual C++ edited resources
+#include "l.chs\afxres.rc"          // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

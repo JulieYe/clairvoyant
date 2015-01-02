@@ -1,0 +1,24 @@
+## WARNING: applications not tested yet.
+
+TODO:
+1. create test case for SimMain (done)
+2. compile CTPTrader and test trade it
+3. clean up all makefiles. make sure only top level file needs to be changed when compiling with different flags (or get rid of more flags). (done)
+
+4. clean up Matchy class
+5. to speed up code
+   a) pre-allocate messages and use pointers around
+   b) make exhchange name and ticker to be enum (comparing enum vs comparing strings)
+   
+
+
+Pay attention to the following comments in the source files:
+$ /* TODO */
+$ /* TOCHECK */
+
+
+Please set the following environment variables in your .bashrc or .profile
+export ZZTRADERBIN=path..to..futures_trade/src
+export ZZDATAROOT=path..to..futures_trade..data
+export ZZDATAOUT=path..to..futures_trade..simulation..output
+export ZZCONFIG=path..to..futures_trade/config

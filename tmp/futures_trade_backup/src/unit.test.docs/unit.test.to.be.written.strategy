@@ -1,0 +1,23 @@
+mostly make sure that status updates correctly.
+
+
+1. with one product in the strategy:
+   (a) send two buy limit orders, 2 sell limit orders, 1 market buy orders
+       check limitOrderCounts
+   (b) receive the fill message from market buy, 4 acks
+       check volume, openposition, openpnl, closedpnl, pnl, fillcounts
+
+   (c) receive fill messages from the two sell limit orders
+       check volume, openposition, openpnl, closedpnl, pnl, fillcounts
+
+   (d) send two cancel messages for the buy limit orders
+       check limitordercounts, marketordercounts, cancelcounts, fillcounts
+   (e) receive cancel acks and bookupdates
+       check openpnl closedpnl and pnl
+   (f) check the strat_id of outgoing messages
+
+
+2. with two products in the strategy:
+   repeat 1 do it for two products
+
+ 

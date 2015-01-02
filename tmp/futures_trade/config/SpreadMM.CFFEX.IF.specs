@@ -1,0 +1,13 @@
+Exchange=CFFEX
+TickerHead=IF
+StartTradingTime=09:16:00
+ExitNoonTime=11:29:00
+StartNoonTime=13:01:00
+ExitTradingTime=15:14:00
+EnterEdge=0.4
+ExitEdge=0.2
+Buffer=0.6
+StopLoss=-100.0
+MaxSpreadPosition=4
+MaxCancelQty=480
+OrderSize=1

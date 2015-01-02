@@ -1,0 +1,31 @@
+#############################
+1. spread
+lead lag spread stuff, one moves, another follows?
+money value: 5 (fei) 3.5 (mingyuan)
+effort required: 3 (fei) 2 (mingyuan)
+status: IF productionized (fei)
+more: expand to SHFE commodity futures
+
+2. market making
+high vol vs low vol
+prediction greater than threshold or lower than threshold
+post two side market or one side market
+need at least 3 tick wide for IF?
+
+money value: 6.5 (fei) 8 (mingyuan)
+effort required: 2 (fei) 5.5 (mingyuan)
+
+3. expand to commodity
+simple trend following: following quick movements with volume support.
+money value: 3.5 (fei) 2.5 (mingyuan)
+effort required: 4 (fei) 3.5 (mingyuan)
+
+4. breakout signal and trade: chart the data, and try to make sense out it, run grid search strategy
+money value: 5 (fei) 4.5 (mingyuan)
+effort required: 6.5 (fei) 6.5 (mingyuan)
+
+5. CME-style trade
+use fill probe as a feature to quickly trade directionally
+
+6. use 500-millisecond prediction as execution strategy
+status: mingyuan working on it

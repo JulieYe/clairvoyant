@@ -1,0 +1,8 @@
+#include "%s.hpp"
+
+namespace simulator
+{
+
+}
+
+// %s_CPP

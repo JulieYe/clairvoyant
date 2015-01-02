@@ -1,0 +1,38 @@
+Questions for brokers:
+
+
+1. colocation related
+
+a. any co-location service at all, for all futures exchanges?
+b. our own machine or broker provide machine?
+c. if brokers machine, specs of their boxes? if our own machine, requirement for specs?
+d. fees?
+e. how to set up? networking? remote control?
+f. latency profile?
+e. documentations?
+
+
+2. technical details
+a. traders api
+b. market data api
+c. back office software (end of day or intraday, delay? etc)
+d. documentations?
+e. testing environment?
+f. system? supported languages?
+g. fees for use the api?
+h. broker gui (for visualizing position, orders)
+i. order types? just limit order market order? any ioc support?
+j. number of cancelation constraint per day? (per account? can we do multiple account?)
+k. other constraint in trading?
+l. how much brokers latency add to exchange latency
+m. messaging limit.
+n. historical market data
+
+3. services
+a. emergency contact, (call to cancel all orders etc)
+b. support to guarantee that we use a separate trading seat
+
+4. fees?margin?
+a. exchange fees/broker fees
+b. initial margin and maintenance margin requirement
+

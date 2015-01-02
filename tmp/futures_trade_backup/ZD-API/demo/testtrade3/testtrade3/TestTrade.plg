@@ -1,0 +1,60 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: TestTrade - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"debug/TestTrade.res" /d "_DEBUG" /d "_AFXDLL" "E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\TestTrade.rc"" 
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP5F28.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"debug/" /Fp"debug/TestTrade.pch" /Yu"stdafx.h" /Fo"debug/" /Fd"debug/" /FD /GZ /c 
+"E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\BaseThread.cpp"
+"E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\TestTrade.cpp"
+"E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\TestTradeDlg.cpp"
+"E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\TradeSpi.cpp"
+"E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\TradeThread.cpp"
+]
+Creating command line "cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP5F28.tmp" 
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP5F29.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /FR"debug/" /Fp"debug/TestTrade.pch" /Yc"stdafx.h" /Fo"debug/" /Fd"debug/" /FD /GZ /c 
+"E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP5F29.tmp" 
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP5F2A.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:yes /pdb:"debug/TestTrade.pdb" /debug /machine:I386 /out:"E:\程序\bin//TestTrade.exe" /pdbtype:sept 
+".\debug\BaseThread.obj"
+".\debug\StdAfx.obj"
+".\debug\TestTrade.obj"
+".\debug\TestTradeDlg.obj"
+".\debug\TradeSpi.obj"
+".\debug\TradeThread.obj"
+".\debug\TestTrade.res"
+]
+Creating command line "link.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP5F2A.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+BaseThread.cpp
+TestTrade.cpp
+TestTradeDlg.cpp
+E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\TestTradeDlg.cpp(311) : warning C4101: 'port' : unreferenced local variable
+TradeSpi.cpp
+E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\TradeSpi.cpp(488) : warning C4244: 'initializing' : conversion from '__int64' to 'unsigned long', possible loss of data
+TradeThread.cpp
+Generating Code...
+Linking...
+LINK : LNK6006: program database E:\API\中大行情\20131015中大行情api\demo\TestTrade3\TestTrade3\debug\TestTrade.pdb missing; performing full link
+
+
+
+<h3>Results</h3>
+TestTrade.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
