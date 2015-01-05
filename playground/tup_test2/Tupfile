@@ -1,0 +1,3 @@
+: |> echo "generated text" > %o |> generated.txt
+: |> echo "unused text" > %o |> unused.txt
+: generated.txt unused.txt |> ./test.sh > %o |> output.txt

@@ -1,0 +1,4 @@
+include_rules
+CFLAGS += -Inewmath
+: foreach *.c |> !cc |> 
+: *.o newmath/libnewmath.a |> gcc %f -o %o |> hello
