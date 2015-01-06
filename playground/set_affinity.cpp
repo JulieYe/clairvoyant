@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <sched.h>
 #include <cstdlib>
 using namespace std;
