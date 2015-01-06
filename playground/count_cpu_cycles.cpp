@@ -11,5 +11,8 @@ int main() {
   std::cout << rdtsc() << std::endl;
   std::cout << rdtsc() << std::endl;
   std::cout << rdtsc() << std::endl;
+  auto a = rdtsc();
+  auto b = rdtsc();
+  printf("%llu\n", b-a);
   return 0;
 }
