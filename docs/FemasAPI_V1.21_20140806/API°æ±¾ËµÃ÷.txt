@@ -1,0 +1,30 @@
+****
+**** 请使用最新版本的文件替换相应的dll或.so文件。
+****
+-----------------------------------------------------------
+飞马API V1.21的修改内容说明：
+1.增加了FAK/FOK、最优价、市价五档等新交易指令，见ReqOrderInsert()
+ 
+---------------------------------------------------------
+飞马API V1.20的修改内容说明：
+1.增加了双边报价接口 ReqQuoteInsert() 和 OnRspQuoteInsert() 
+2.增加了双边报价撤单接口	ReqQuoteAction() 和 OnRspQuoteAction()
+3.增加了询价接口 ReqForQuote() 和	OnRspForQuote()
+4.增加了询价流订阅接口	SubscribeForQuote()
+5.增加了双边报价回报接口 OnRtnQuote() 和	OnErrRtnQuoteInsert()
+ 
+---------------------------------------------------------
+
+飞马API V1.00修改内容说明：
+1. 新增出入金回报接口
+	
+	///账户出入金回报
+	virtual void OnRtnInvestorAccountDeposit(CUstpFtdcInvestorAccountDepositResField *pInvestorAccountDepositRes) {};
+
+
+
+---------------------------------------------------------
+
+飞马API V0.92的修改内容说明：
+1.解决了同一个进程下交易和行情只能连上一个的缺陷。
+
