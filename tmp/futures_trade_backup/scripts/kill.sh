@@ -1,1 +1,0 @@
-kill -9 $(ps aux | grep "[T]rader" | awk {'print $2'})

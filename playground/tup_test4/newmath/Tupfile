@@ -1,3 +1,0 @@
-include_rules
-: foreach *.c |> !cc |> 
-: *.o |> !ar |> libnewmath.a

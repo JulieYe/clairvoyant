@@ -1,3 +1,0 @@
-: |> sh gen_triangle.sh > %o |> triangle.h
-: foreach *.c | triangle.h |> gcc -Wall -c %f -o %o |> %B.o
-: *.o |> gcc %f -o %o |> hello
