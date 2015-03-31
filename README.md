@@ -3,5 +3,6 @@ A general high performance computing regarding finance library for R projects [!
 
 # Installation
 ```R
+if (!require("devtools")) install.packages("devtools")
 devtools::install_github("JulieYe", "clairvoyant")
 ```
