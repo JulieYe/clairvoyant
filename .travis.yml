@@ -1,0 +1,5 @@
+language: r
+
+r_binary_packages:
+ - testthat
+ - Rcpp
