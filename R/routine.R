@@ -11,7 +11,7 @@
 prepare_data <- function(filenames, sep, instrument_predict, instruments_train, horizon,
   ticksize = 0.2, trainpct = 0.8, seed = 29) {
 
-  stopifno(require(bit64))
+  stopifnot(require(bit64))
 
   dat <- data.frame()
   for (filename in filenames) {
@@ -35,50 +35,35 @@ prepare_data <- function(filenames, sep, instrument_predict, instruments_train, 
   set.seed(seed)
   id_tr <- caret::createDataPartition(factor(round(dat$Change / ticksize)), 
     p = trainpct, list = FALSE, times = 1)[, 1]
-  list(data_tr = dat[id_tr, ], data_ts = dat[-id_tr, ]) 
+  list(dat_tr = dat[id_tr, ], dat_ts = dat[-id_tr, ]) 
 }
 
 
-#' Train the model on training data set and output the performance.
+#' Evaluate the model on training data set and output the performance.
 #' @param dat_tr data.frame.
 #' @param dat_ts data.frame.
 #' @param dep_var character. Name of dependent variable.
+#' @param n_trees interger. Number of trees.
 #' @export
-train <- function(dat_tr, dat_ts, dep_var = "Change") {
+evaluate_model <- function(dat_tr, dat_ts, dep_var = "Change", n_trees = 500) {
 
-  dat_tr <- dat_tr[, colnames(dat_tr), drop = FALSE]
-  colnames(dat_tr) <- vapply(colnames(dat_tr),
-    function(x) gsub("[<>()|]", "_", x), character(1), USE.NAMES = FALSE)
-  colnames(dat_ts) <- vapply(colnames(dat_ts),
-    function(x) gsub("[<>()|]", "_", x), character(1), USE.NAMES = FALSE)
+  id_0_var <- which(vapply(dat_tr, sd, numeric(1)) == 0)
+  if (length(id_0_var) > 0) {
+    print(paste0(paste(colnames(dat_tr)[id_0_var], collapse = "\n"), " are removed"))
+    dat_tr <- dat_tr[, -id_0_var]
+    dat_ts <- dat_ts[, -id_0_var]
+  }
 
-  factor_cols <- Filter(function(x) is.factor(dat_tr[[x]]), 
-    setdiff(colnames(dat_tr), dep_var))
+  dtrain <- xgboost::xgb.DMatrix(as.matrix(dat_tr[, !colnames(dat_tr) %in% c("Change")]), 
+    label = dat_tr$Change)
+  dtest <- xgboost::xgb.DMatrix(as.matrix(dat_ts[, !colnames(dat_ts) %in% c("Change")]), 
+    label = dat_ts$Change)
 
-  contrasts <- sapply(factor_cols, 
-    function(x) contr.treatment(levels(dat_tr[, x]), 
-    contrasts = FALSE), USE.NAMES = TRUE)
-
-  options_na_action_restore <- options(na.action = 'na.pass')
-  on.exit(options(options_na_action_restore), add = TRUE)
-
-  form <- formulify(setdiff(colnames(dat_tr), dep_var))
-
-  data_tr <- model.matrix(form, data = dat_tr, contrasts.arg = contrasts)[, -1]
-  data_ts <- model.matrix(form, data = dat_ts, contrasts.arg = contrasts)[, -1]
-  label_tr <- dat_tr[[dep_var]]
-  label_ts <- dat_ts[[dep_var]]
-
-  dtrain <- xgboost::xgb.DMatrix(data_tr, label = label_tr, missing = NA)
-  dtest <- xgboost::xgb.DMatrix(data_ts, label = label_ts, missing = NA)
-
-  watchlist <- list(eval = dtest, train = dtrain)
-
-  param <- list(max.depth=7,eta=0.001,nthread = 4, silent=1,objective='reg:linear',
+  param <- list(max.depth=6, eta=0.001, nthread = 4, silent=1, objective='reg:linear',
         subsample = 0.5, colsample_bytree = 0.5)
-  bst <- xgb.train( param, dtrain, 6000, watchlist )
-  ptrain  <- predict(bst, dtrain, outputmargin=TRUE)
-  ptest  <- predict(bst, dtest, outputmargin=TRUE)
-  print(1 - sum( (label_tr - ptrain) ^ 2) / sum(label_tr ^ 2))
-  print(1 - sum( (label_ts - ptest) ^ 2) / sum(label_ts ^ 2))
+  bst <- xgboost::xgb.train(param, dtrain, n_trees)
+  ptrain  <- xgboost::predict(bst, dtrain, outputmargin=TRUE)
+  ptest  <- xgboost::predict(bst, dtest, outputmargin=TRUE)
+  print(1 - sum( (dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2))
+  print(1 - sum( (dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2))
 }

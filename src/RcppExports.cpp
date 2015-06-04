@@ -9,14 +9,10 @@ using namespace Rcpp;
 int timesTwo(int x);
 RcppExport SEXP clairvoyant_timesTwo(SEXP xSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< int >::type x(xSEXP );
-        int __result = timesTwo(x);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< int >::type x(xSEXP);
+    __result = Rcpp::wrap(timesTwo(x));
+    return __result;
 END_RCPP
 }
