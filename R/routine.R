@@ -11,6 +11,7 @@
 prepare_data <- function(filenames, sep, instrument_predict, instruments_train, horizon,
   ticksize = 0.2, trainpct = 0.8, seed = 29) {
 
+  stopifnot(require(data.table))
   stopifnot(require(bit64))
 
   dat <- data.frame()
@@ -38,7 +39,6 @@ prepare_data <- function(filenames, sep, instrument_predict, instruments_train, 
   list(dat_tr = dat[id_tr, ], dat_ts = dat[-id_tr, ]) 
 }
 
-
 #' Evaluate the model on training data set and output the performance.
 #' @param dat_tr data.frame.
 #' @param dat_ts data.frame.
@@ -64,6 +64,6 @@ evaluate_model <- function(dat_tr, dat_ts, dep_var = "Change", n_trees = 500) {
   bst <- xgboost::xgb.train(param, dtrain, n_trees)
   ptrain  <- xgboost::predict(bst, dtrain, outputmargin=TRUE)
   ptest  <- xgboost::predict(bst, dtest, outputmargin=TRUE)
-  print(1 - sum( (dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2))
-  print(1 - sum( (dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2))
+  cat(paste0("In-sample R2: ", 1 - sum( (dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)))
+  cat(paste0("Out-of-sample R2 ", 1 - sum( (dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)))
 }
