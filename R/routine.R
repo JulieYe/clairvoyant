@@ -4,11 +4,15 @@
 #' @param horizon integer. The prediction horizon in seconds.
 #' @param subsample_freq integer. The daily sparsity of subsample frequency.
 #' @param ticksize numeric. The tick size of the predicted instrument.
+#' @param cap numeric. Cap in terms of standard deviation.
 #' @param trainpct numeric. The percentage of training data set.
 #' @param seed integer. Seed of randomized validation data set.
+#' @param verbose logical. As name suggests.
+#' @param debug logical. Whether datetime will be appended to the output of data frame.
 #' @export
 load_data <- function(dir_data, sep, horizon, 
-  subsample_freq = 10, ticksize = 0.2, trainpct = 0.8, seed = 29, 
+  subsample_freq = 10, ticksize = 0.2, cap = Inf,
+  trainpct = 0.9, seed = 29, 
   verbose = TRUE, debug = FALSE) {
 
   stopifnot(require(data.table))
@@ -39,11 +43,13 @@ load_data <- function(dir_data, sep, horizon,
     if (isTRUE(debug)) date_time <- dat_i$Datetime
     dat_i <- dat_i[, grep("^Feature_.*_0$", colnames(dat_i))]
     dat_i <- cbind(dat_i, "Change" = px_to - px_from)
-    # Cap to 5 sd
-    for (col_name in names(dat_i)) {
-      cap <- 3 * sd(dat_i[[col_name]])
-      dat_i[dat_i[[col_name]] > cap, col_name] <- cap
-      dat_i[dat_i[[col_name]] < -cap, col_name] <- -cap
+    if (is.finite(cap)) {
+      if (isTRUE(verbose)) print("Cap is on")
+      for (col_name in names(dat_i)) {
+        cap_val <- cap * sd(dat_i[[col_name]])
+          dat_i[dat_i[[col_name]] > cap_val, col_name] <- cap_val
+          dat_i[dat_i[[col_name]] < -cap_val, col_name] <- -cap_val
+      }
     }
     if (isTRUE(verbose)) print(paste0("Append ", nrow(dat_i), " by ", ncol(dat_i), " data frame"))
     #if (first) {
@@ -67,13 +73,19 @@ load_data <- function(dir_data, sep, horizon,
 #' @param dat_tr data.frame.
 #' @param dat_ts data.frame.
 #' @param n_trees interger. Number of trees.
+#' @param eta numeric. Shrinkage parameter.
+#' @param max_depth integer. Number of maximum depth of tree.
+#' @param subsample numeric. Percentage of row sampling.
+#' @param colsample_bytree numeric. Percentage of column sampling.
+#' @param nthread integer. Number of threads.
 #' @param output logical. Whether to save the model as texts.
 #' @param model_filename character. Text file to save the model.
 #' @param feature_filename character. Text file to save the features.
 #' @param dep_var character. Name of dependent variable.
 #' @export
-evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, output = FALSE,
-  model_filename, feature_filename, dep_var = "Change") {
+evaluate_model <- function(dat_tr, dat_ts, 
+  n_trees = 500, eta = 0.001, max_depth = 6, subsample = 1, colsample_bytree = 1, nthread,
+  output = FALSE, model_filename, feature_filename, dep_var = "Change") {
 
   stopifnot(require(xgboost))
 
@@ -89,9 +101,11 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, output = FALSE,
   dtest <- xgboost::xgb.DMatrix(as.matrix(dat_ts[, !colnames(dat_ts) %in% c("Change")]), 
     label = dat_ts$Change)
 
-  param <- list(max.depth=7, eta=0.001, nthread = 4, silent=1, objective='reg:linear',
-        subsample = 0.5, colsample_bytree = 0.5)
+  param <- list(max.depth = max_depth, eta = eta, silent = 1, objective='reg:linear',
+    ifelse(missing(nthread), parallel::detectCores(), 1),
+    subsample = subsample, colsample_bytree = colsample_bytree)
   bst <- xgboost::xgb.train(param, dtrain, n_trees)
+
   ptrain  <- xgboost::predict(bst, dtrain, outputmargin=TRUE)
   ptest  <- xgboost::predict(bst, dtest, outputmargin=TRUE)
   cat(paste0("In-sample R2: ", 
