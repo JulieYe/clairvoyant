@@ -1,28 +1,33 @@
 #' Prepare data for financial analysis.
-#' @param filenames an atomic vector of character. The name of the data csv file. 
+#' @param dir_data character. The directory of the csv data files. 
 #' @param sep character. The separator of csv file. 
-#' @param instrument_predict character. The instrument to predict the price change in the future.
-#' @param instruments_train an atomic vector of character. The signaling instruments.
 #' @param horizon integer. The prediction horizon in seconds.
+#' @param subsample_freq integer. The daily sparsity of subsample frequency.
 #' @param ticksize numeric. The tick size of the predicted instrument.
 #' @param trainpct numeric. The percentage of training data set.
 #' @param seed integer. Seed of randomized validation data set.
 #' @export
-prepare_data <- function(filenames, sep, instrument_predict, instruments_train, horizon,
-  ticksize = 0.2, trainpct = 0.8, seed = 29) {
+load_data <- function(dir_data, sep, horizon, 
+  subsample_freq = 10, ticksize = 0.2, trainpct = 0.8, seed = 29) {
 
   stopifnot(require(data.table))
   stopifnot(require(bit64))
 
   dat <- data.frame()
+  filenames <- dir(dir_data)
   for (filename in filenames) {
-    dat_i <- data.table::fread(filename, sep = sep)
+    print(paste0("Parsing ", filename))
+    dat_i <- data.table::fread(paste(dir_data, filename, sep = "/"), sep = sep)
     class(dat_i) <- "data.frame"
+    px_to <- grep(paste0("MidPoint<>\\(.*\\)_", horizon * 1000), colnames(dat_i))
+    if (length(px_to) != 1) {
+      print("Did not get the specific horizin to predict on")
+      next
+    }
+    instrument_predict <- strsplit(strsplit(colnames(dat_i)[px_to], 
+      split = "\\(")[[1]][2], "\\)")[[1]][1]
     px_from <- grep(paste0("MidPoint<>\\(", instrument_predict, "\\)_0"), colnames(dat_i))
-    px_to <- grep(paste0("MidPoint<>\\(", instrument_predict, "\\)_", horizon * 1000), 
-      colnames(dat_i))
-    if (length(px_from) != 1 ||
-        length(px_to) != 1) {
+    if (length(px_from) != 1) {
       print("Did not get the unique instrument to predict on")
       next
     }
@@ -31,7 +36,8 @@ prepare_data <- function(filenames, sep, instrument_predict, instruments_train, 
     dat_i <- dat_i[, -grep("MidPoint<>", colnames(dat_i))] 
     dat_i <- dat_i[, grep("^Feature_.*_0$", colnames(dat_i))]
     dat_i <- cbind(dat_i, "Change" = px_to - px_from)
-    dat <- rbind(dat, dat_i)
+    dat <- rbind(dat, dat_i[seq(subsample_freq, nrow(dat_i), by = subsample_freq), , drop = FALSE])
+    print(paste0("Parsed ", filename))
   }
   set.seed(seed)
   id_tr <- caret::createDataPartition(factor(round(dat$Change / ticksize)), 
@@ -46,6 +52,8 @@ prepare_data <- function(filenames, sep, instrument_predict, instruments_train, 
 #' @param n_trees interger. Number of trees.
 #' @export
 evaluate_model <- function(dat_tr, dat_ts, dep_var = "Change", n_trees = 500) {
+
+  stopifnot(require(xgboost))
 
   id_0_var <- which(vapply(dat_tr, sd, numeric(1)) == 0)
   if (length(id_0_var) > 0) {
