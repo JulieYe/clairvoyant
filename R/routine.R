@@ -108,7 +108,7 @@ evaluate_model <- function(dat_tr, dat_ts,
 
     r2 <- rep(NA, nrow(par_grid))
 
-    cat(paste(c("i", colnames(par_grid), "R2\n"), collapse = " "))
+    cat(paste(c("i", colnames(par_grid), "R2_tr R2_ts\n"), collapse = " "))
     for (i in seq_len(nrow(par_grid))) {
       param <- list(max.depth = par_grid[i, "max_depth"], 
         subsample = par_grid[i, "subsample"], 
@@ -116,9 +116,12 @@ evaluate_model <- function(dat_tr, dat_ts,
         eta = eta, silent = 1, objective='reg:linear',
         nthread = ifelse(missing(nthread), parallel::detectCores(), 1))
       bst <- xgboost::xgb.train(param, dtrain, n_trees)
+      ptrain <- xgboost::predict(bst, dtrain)
       ptest <- xgboost::predict(bst, dtest)
+      r2_train <- 1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)
       r2[i] <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
-      cat(paste0(paste(c(i, par_grid[i, , drop = FALSE], r2[i]), collapse = " "), "\n"))  
+      cat(paste0(paste(c(i, par_grid[i, , drop = FALSE], 
+        round(r2_train, 4), round(r2[i], 4)), collapse = "\t"), "\n"))  
     }
     
     idx_optimal <- which.max(r2)
