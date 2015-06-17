@@ -129,7 +129,7 @@ evaluate_model <- function(dat_tr, dat_ts,
 
   param <- list(max.depth = max_depth, subsample = subsample, 
     colsample_bytree = colsample_bytree, eta = eta, silent = 1, 
-    objective='reg:linear', ifelse(missing(nthread), parallel::detectCores(), 1),
+    objective='reg:linear', ifelse(missing(nthread), parallel::detectCores(), 1)
   bst <- xgboost::xgboost(data = dtrain, label = ltrain, nrounds = n_trees, param, verbose = 0)
 
   ptrain <- xgboost::predict(bst, dtrain)
