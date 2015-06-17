@@ -104,14 +104,15 @@ evaluate_model <- function(dat_tr, dat_ts,
   if (length(max_depth) > 1 || length(subsample) > 1 || length(colsample_bytree) > 1) {
     par_grid <- expand.grid(list(max_depth = max_depth, 
       subsample = subsample, colsample_bytree = colsample_bytree))
+    print(par_grid)
 
     r2 <- rep(NA, nrow(par_grid))
 
     cat(paste(c("i", colnames(par_grid), "R2\n"), collapse = " "))
     for (i in seq_len(nrow(par_grid))) {
-      param <- list(max.depth = par_grid[i]$max_depth, 
-        subsample = par_grid[i]$subsample, 
-        colsample_bytree = par_grid[i]$colsample_bytree,
+      param <- list(max.depth = par_grid[i, "max_depth"], 
+        subsample = par_grid[i, "subsample"], 
+        colsample_bytree = par_grid[i, "colsample_bytree"],
         eta = eta, silent = 1, objective='reg:linear',
         ifelse(missing(nthread), parallel::detectCores(), 1))
       bst <- xgboost::xgboost(data = dtrain, label = ltrain, nrounds = n_trees, 
