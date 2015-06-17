@@ -52,8 +52,8 @@ load_data <- function(dir_data, sep, horizon,
       }
     }
     if (isTRUE(verbose)) print(paste0("Append ", nrow(dat_i), " by ", ncol(dat_i), " data frame"))
+    if (isTRUE(debug)) dat_i <- cbind(dat_i, datetime = date_time)
     #if (first) {
-      if (isTRUE(debug)) dat_i <- cbind(dat_i, datetime = date_time)
       dat <- rbind(dat, dat_i[seq(subsample_freq, nrow(dat_i), 
         by = subsample_freq), , drop = FALSE])
     #} else {
