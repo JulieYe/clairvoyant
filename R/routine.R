@@ -96,28 +96,54 @@ evaluate_model <- function(dat_tr, dat_ts,
     dat_ts <- dat_ts[, -id_0_var]
   }
 
-  dtrain <- xgboost::xgb.DMatrix(as.matrix(dat_tr[, !colnames(dat_tr) %in% c("Change")]), 
-    label = dat_tr$Change)
-  dtest <- xgboost::xgb.DMatrix(as.matrix(dat_ts[, !colnames(dat_ts) %in% c("Change")]), 
-    label = dat_ts$Change)
+  dtrain <- as.matrix(dat_tr[, !colnames(dat_tr) %in% c("Change")]) 
+  ltrain <- dat_tr$Change
+  dtest <- as.matrix(dat_ts[, !colnames(dat_ts) %in% c("Change")])
+  ltest <- dat_ts$Change
 
-  param <- list(max.depth = max_depth, eta = eta, silent = 1, objective='reg:linear',
-    ifelse(missing(nthread), parallel::detectCores(), 1),
-    subsample = subsample, colsample_bytree = colsample_bytree)
-  bst <- xgboost::xgb.train(param, dtrain, n_trees)
+  if (length(max_depth) > 1 || length(subsample) > 1 || length(colsample_bytree) > 1) {
+    par_grid <- expand.grid(list(max_depth = max_depth, 
+      subsample = subsample, colsample_bytree = colsample_bytree))
 
-  ptrain  <- xgboost::predict(bst, dtrain, outputmargin=TRUE)
-  ptest  <- xgboost::predict(bst, dtest, outputmargin=TRUE)
+    r2 <- rep(NA, nrow(par_grid))
+
+    cat(paste(c("i", colnames(par_grid), "R2\n"), collapse = " "))
+    for (i in seq_len(nrow(par_grid))) {
+      param <- list(max.depth = par_grid[i]$max_depth, 
+        subsample = par_grid[i]$subsample, 
+        colsample_bytree = par_grid[i]$colsample_bytree,
+        eta = eta, silent = 1, objective='reg:linear',
+        ifelse(missing(nthread), parallel::detectCores(), 1))
+      bst <- xgboost::xgboost(data = dtrain, label = ltrain, nrounds = n_trees, 
+        param, verbose = 0)
+      ptest  <- xgboost::predict(bst, dtest)
+      r2[i] <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
+      cat(paste0(paste(c(i, par_grid[i, , drop = FALSE], r2[i]), collapse = " "), "\n"))  
+    }
+    
+    idx_optimal <- which.max(r2)
+    max_depth <- par_grid[idx_optimal]$max_depth
+    subsample <- par_grid[idx_optimal]$subsample
+    colsample_bytree <- par_grid[idx_optimal]$colsample_bytree
+  }
+
+  param <- list(max.depth = max_depth, subsample = subsample, 
+    colsample_bytree = colsample_bytree, eta = eta, silent = 1, 
+    objective='reg:linear', ifelse(missing(nthread), parallel::detectCores(), 1),
+  bst <- xgboost::xgboost(data = dtrain, label = ltrain, nrounds = n_trees, param, verbose = 0)
+
+  ptrain  <- xgboost::predict(bst, dtrain)
+  ptest  <- xgboost::predict(bst, dtest)
   cat(paste0("In-sample R2: ", 
     1 - sum( (dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2), "\n"))
   cat(paste0("Out-of-sample R2 ", 
     1 - sum( (dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2), "\n"))
   if (isTRUE(output)) {
     dat <- rbind(dat_tr, dat_ts)
-    dfull <- xgboost::xgb.DMatrix(as.matrix(dat[, !colnames(dat) %in% c("Change")]), 
-      label = dat$Change)
-    bst <- xgboost::xgb.train(param, dfull, n_trees)
-    pfull  <- xgboost::predict(bst, dfull, outputmargin=TRUE)
+    dfull <- as.matrix(dat[, !colnames(dat) %in% c("Change")]) 
+    lfull = dat$Change
+    bst <- xgboost::xgboost(data = dfull, label = lfull, nrounds = n_trees, param, verbose = 0)
+    pfull  <- xgboost::predict(bst, dfull)
     cat(paste0("Full-sample R2: ", 
       1 - sum( (dat$Change - pfull) ^ 2) / sum(dat$Change ^ 2), "\n"))
 
