@@ -132,10 +132,10 @@ evaluate_model <- function(dat_tr, dat_ts,
     objective='reg:linear', ifelse(missing(nthread), parallel::detectCores(), 1),
   bst <- xgboost::xgboost(data = dtrain, label = ltrain, nrounds = n_trees, param, verbose = 0)
 
-  ptrain  <- xgboost::predict(bst, dtrain)
-  ptest  <- xgboost::predict(bst, dtest)
+  ptrain <- xgboost::predict(bst, dtrain)
   cat(paste0("In-sample R2: ", 
     1 - sum( (dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2), "\n"))
+  ptest <- xgboost::predict(bst, dtest)
   cat(paste0("Out-of-sample R2 ", 
     1 - sum( (dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2), "\n"))
   if (isTRUE(output)) {
