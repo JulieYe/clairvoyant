@@ -125,9 +125,9 @@ evaluate_model <- function(dat_tr, dat_ts,
     }
     
     idx_optimal <- which.max(r2)
-    max_depth <- par_grid[idx_optimal]$max_depth
-    subsample <- par_grid[idx_optimal]$subsample
-    colsample_bytree <- par_grid[idx_optimal]$colsample_bytree
+    max_depth <- par_grid[idx_optimal, "max_depth"]
+    subsample <- par_grid[idx_optimal, "subsample"]
+    colsample_bytree <- par_grid[idx_optimal, "colsample_bytree"]
   }
 
   param <- list(max.depth = max_depth, subsample = subsample, 
