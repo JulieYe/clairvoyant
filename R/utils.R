@@ -32,7 +32,7 @@ convert2config <- function(filename_model, filename_features,
     split_value <- splits1[2]
     left_child <- strsplit(splits[2], ",")[[1]][1]
     # Write to config.
-    cat(paste(node, feature, split_value, left_child, sep = ","), 
+    cat(paste0(paste(node, feature, split_value, left_child, sep = ","), "\n"), 
       file = filename_tree, append = TRUE)
     # Append to feature indices set.
     if (!as.integer(feature) %in% features) {
@@ -43,7 +43,7 @@ convert2config <- function(filename_model, filename_features,
   content_features <- readLines(filename_features)
   for (line in content_features) {
     if (as.integer(strsplit(line, ":")[[1]][2]) %in% features) {
-      cat(line, file = filename_features_effective, append = TRUE)
+      cat(paste0(line, "\n"), file = filename_features_effective, append = TRUE)
     }
   }
   TRUE
