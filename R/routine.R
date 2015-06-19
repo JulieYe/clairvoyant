@@ -20,7 +20,7 @@ load_data <- function(dir_data, sep, horizon,
 
   dat <- data.frame()
   filenames <- dir(dir_data)
-  #first <- TRUE
+  first <- TRUE
   for (filename in filenames) {
     if (isTRUE(verbose)) print(paste0("Parsing ", filename))
     dat_i <- data.table::fread(paste(dir_data, filename, sep = "/"), sep = sep)
@@ -53,14 +53,14 @@ load_data <- function(dir_data, sep, horizon,
     }
     if (isTRUE(verbose)) print(paste0("Append ", nrow(dat_i), " by ", ncol(dat_i), " data frame"))
     if (isTRUE(debug)) dat_i <- cbind(dat_i, datetime = date_time)
-    #if (first) {
+    if (first) {
       dat <- rbind(dat, dat_i[seq(subsample_freq, nrow(dat_i), 
         by = subsample_freq), , drop = FALSE])
-    #} else {
-    #  dat <- rbind(dat, setNames(dat_i[seq(subsample_freq, nrow(dat_i), 
-    #    by = subsample_freq), , drop = FALSE], names(dat)))
-    #}
-    #first <- FALSE
+      first <- FALSE
+    } else {
+      dat <- rbind(dat, setNames(dat_i[seq(subsample_freq, nrow(dat_i), 
+        by = subsample_freq), , drop = FALSE], names(dat)))
+    }
     if (isTRUE(verbose)) print(paste0("Parsed ", filename))
   }
   set.seed(seed)
