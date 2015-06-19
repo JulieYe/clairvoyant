@@ -26,11 +26,17 @@ convert2config <- function(filename_model, filename_features,
     # Parse the line.
     node <- sub(":(.*)", "", line)
     rest <- gsub("([[:alpha:]]|=|\\[|\\])", "", sub("^[0-9]+:", "", line))
-    splits <- strsplit(rest, " ")[[1]]
-    splits1 <- strsplit(splits[1], "<")[[1]]
-    feature <- splits1[1]
-    split_value <- splits1[2]
-    left_child <- strsplit(splits[2], ",")[[1]][1]
+    if (grepl("leaf") {
+      feature <- -1
+      split_value <- strsplit(rest, "=")[[1]][2]
+      left_child <- 0
+    } else {
+      splits <- strsplit(rest, " ")[[1]]
+      splits1 <- strsplit(splits[1], "<")[[1]]
+      feature <- splits1[1]
+      split_value <- splits1[2]
+      left_child <- strsplit(splits[2], ",")[[1]][1]
+    }
     # Write to config.
     cat(paste0(paste(node, feature, split_value, left_child, sep = ","), "\n"), 
       file = filename_tree, append = TRUE)
