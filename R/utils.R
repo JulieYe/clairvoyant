@@ -1,6 +1,6 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-convert2config <- function(filname_model, filename_features, 
+convert2config <- function(filename_model, filename_features, 
   filename_tree_prefix, filename_features_effective) {
   if (!file.exists(filename_model) ||
       !file.exists(filename_features)) {
