@@ -5,7 +5,7 @@
 \title{Evaluate the model on training data set and output the performance.}
 \usage{
 evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6,
-  subsample = 1, colsample_bytree = 1, nthread, output = FALSE,
+  subsample = 0.75, colsample_bytree = 0.75, nthread, output = FALSE,
   model_filename, feature_filename, dep_var = "Change")
 }
 \arguments{

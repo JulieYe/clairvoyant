@@ -84,8 +84,8 @@ load_data <- function(dir_data, sep, horizon,
 #' @param dep_var character. Name of dependent variable.
 #' @export
 evaluate_model <- function(dat_tr, dat_ts, 
-  n_trees = 500, eta = 0.001, max_depth = 6, subsample = 1, colsample_bytree = 1, nthread,
-  output = FALSE, model_filename, feature_filename, dep_var = "Change") {
+  n_trees = 500, eta = 0.001, max_depth = 6, subsample = 0.75, colsample_bytree = 0.75, 
+  nthread, output = FALSE, model_filename, feature_filename, dep_var = "Change") {
 
   stopifnot(require(xgboost))
 
@@ -96,26 +96,27 @@ evaluate_model <- function(dat_tr, dat_ts,
     dat_ts <- dat_ts[, -id_0_var]
   }
 
-
   dtrain <- xgboost::xgb.DMatrix(as.matrix(dat_tr[, !colnames(dat_tr) %in% c("Change")]), 
     label = dat_tr$Change)
   dtest <- xgboost::xgb.DMatrix(as.matrix(dat_ts[, !colnames(dat_ts) %in% c("Change")]), 
     label = dat_ts$Change)
 
-  if (length(max_depth) > 1 || length(subsample) > 1 || length(colsample_bytree) > 1) {
-    par_grid <- expand.grid(list(max_depth = max_depth, 
+  if (length(n_trees) > 1 || length(eta) > 1 || length(max_depth) > 1 ||
+      length(subsample) > 1 || length(colsample_bytree) > 1) {
+    par_grid <- expand.grid(list(n_trees = ntrees, eta = eta, max_depth = max_depth, 
       subsample = subsample, colsample_bytree = colsample_bytree))
 
     r2 <- rep(NA, nrow(par_grid))
 
     cat(paste(c("i", colnames(par_grid), "R2_tr R2_ts\n"), collapse = " "))
     for (i in seq_len(nrow(par_grid))) {
-      param <- list(max.depth = par_grid[i, "max_depth"], 
+      param <- list(eta = par_grid[i, "eta"],
+        max.depth = par_grid[i, "max_depth"], 
         subsample = par_grid[i, "subsample"], 
         colsample_bytree = par_grid[i, "colsample_bytree"],
-        eta = eta, silent = 1, objective='reg:linear',
+        silent = 1, objective='reg:linear',
         nthread = ifelse(missing(nthread), parallel::detectCores(), 1))
-      bst <- xgboost::xgb.train(param, dtrain, n_trees)
+      bst <- xgboost::xgb.train(param, dtrain, par_grid[i, "n_trees"])
       ptrain <- xgboost::predict(bst, dtrain)
       ptest <- xgboost::predict(bst, dtest)
       r2_train <- 1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)
@@ -125,14 +126,16 @@ evaluate_model <- function(dat_tr, dat_ts,
     }
     
     idx_optimal <- which.max(r2)
+    n_trees <- par_grid[idx_optimal, "n_trees"]
+    eta <- par_grid[idx_optimal, "eta"]
     max_depth <- par_grid[idx_optimal, "max_depth"]
     subsample <- par_grid[idx_optimal, "subsample"]
     colsample_bytree <- par_grid[idx_optimal, "colsample_bytree"]
   }
 
-  param <- list(max.depth = max_depth, subsample = subsample, 
-    colsample_bytree = colsample_bytree, eta = eta, silent = 1, 
-    objective='reg:linear', nthread = ifelse(missing(nthread), parallel::detectCores(), 1))
+  param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
+    colsample_bytree = colsample_bytree, silent = 1, objective='reg:linear',
+    nthread = ifelse(missing(nthread), parallel::detectCores(), 1))
   bst <- xgboost::xgb.train(param, dtrain, n_trees)
 
   ptrain <- xgboost::predict(bst, dtrain)
