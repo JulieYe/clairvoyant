@@ -22,7 +22,7 @@ convert2config <- function(filename_model, filename_features,
     }
     # Make sure a specific tree is worked on.
     if (tree_index == 0) next
-    filename_tree <- paste(filename_tree_prefix, as.character(tree_index), collapse = ".")
+    filename_tree <- paste(filename_tree_prefix, as.character(tree_index), sep = ".")
     # Parse the line.
     node <- sub(":(.*)", "", line)
     rest <- gsub("([[:alpha:]]|=|\\[|\\])", "", sub("^[0-9]+:", "", line))
@@ -32,7 +32,7 @@ convert2config <- function(filename_model, filename_features,
     split_value <- splits1[2]
     left_child <- strsplit(splits[2], ",")[[1]][1]
     # Write to config.
-    cat(paste(node, feature, split_value, left_child, collapse = ","), 
+    cat(paste(node, feature, split_value, left_child, sep = ","), 
       filename_tree, append = TRUE)
     # Append to feature indices set.
     if (!as.integer(feature) %in% features) {
