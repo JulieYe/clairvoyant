@@ -103,7 +103,7 @@ evaluate_model <- function(dat_tr, dat_ts,
 
   if (length(n_trees) > 1 || length(eta) > 1 || length(max_depth) > 1 ||
       length(subsample) > 1 || length(colsample_bytree) > 1) {
-    par_grid <- expand.grid(list(n_trees = ntrees, eta = eta, max_depth = max_depth, 
+    par_grid <- expand.grid(list(n_trees = n_trees, eta = eta, max_depth = max_depth, 
       subsample = subsample, colsample_bytree = colsample_bytree))
 
     r2 <- rep(NA, nrow(par_grid))
