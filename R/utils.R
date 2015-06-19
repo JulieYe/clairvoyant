@@ -22,7 +22,7 @@ convert2config <- function(filname_model, filename_features,
     }
     # Make sure a specific tree is worked on.
     if (tree_index == 0) next
-    filename_tree <- paste(filename_tree_prefix, as.character(tree_index), collapse = "_")
+    filename_tree <- paste(filename_tree_prefix, as.character(tree_index), collapse = ".")
     # Parse the line.
     node <- sub(":(.*)", "", line)
     rest <- gsub("([[:alpha:]]|=|\\[|\\])", "", sub("^[0-9]+:", "", line))
