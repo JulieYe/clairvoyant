@@ -1,6 +1,12 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-convert2config <- function(filename_model, filename_features, 
+#' Write raw model and feature files to separate config files.
+#' @param filename_model character. The name of the raw model file.
+#' @param filename_features character. The name of the raw features file.
+#' @param filename_tree_prefix character. The prefix path of the config files of trees.
+#' @param filename_features_effective character. THe name of the effective features file.
+#' @export
+write_config <- function(filename_model, filename_features, 
   filename_tree_prefix, filename_features_effective) {
   if (!file.exists(filename_model) ||
       !file.exists(filename_features)) {

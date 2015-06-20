@@ -122,15 +122,23 @@ evaluate_model <- function(dat_tr, dat_ts,
       r2_train <- 1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)
       r2[i] <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
       cat(paste0(paste(c(i, par_grid[i, , drop = FALSE], 
-        round(r2_train, 4), round(r2[i], 4)), collapse = "\t"), "\n"))  
+        round(r2_train, 4), round(r2[i], 4)), collapse = "\t"), 
+        ifelse(r2[i] > max(r2, na.rm = TRUE), "\t*\n", "\n")))
     }
     
     idx_optimal <- which.max(r2)
+    if (length(idx_optimal) == 0) {
+      stop("evaluate_model failed, all R2 is missing", call. = FALSE)
+    }
+
     n_trees <- par_grid[idx_optimal, "n_trees"]
     eta <- par_grid[idx_optimal, "eta"]
     max_depth <- par_grid[idx_optimal, "max_depth"]
     subsample <- par_grid[idx_optimal, "subsample"]
     colsample_bytree <- par_grid[idx_optimal, "colsample_bytree"]
+    cat(paste0("n_trees: ", n_trees, ", eta: ", eta,
+      ", max_depth: ", max_depth, ", subsample: ", subsample,
+      ", colsample_bytree: ", colsample_bytree, "\n"))
   }
 
   param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
@@ -144,6 +152,8 @@ evaluate_model <- function(dat_tr, dat_ts,
   ptest <- xgboost::predict(bst, dtest)
   cat(paste0("Out-of-sample R2 ", 
     1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2), "\n"))
+
+  # Write to config file.
   if (isTRUE(output)) {
     dat <- rbind(dat_tr, dat_ts)
     dfull <- xgboost::xgb.DMatrix(as.matrix(dat[, !colnames(dat) %in% c("Change")]), 
