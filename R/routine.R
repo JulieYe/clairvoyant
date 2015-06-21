@@ -123,7 +123,7 @@ evaluate_model <- function(dat_tr, dat_ts,
       r2[i] <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
       cat(paste0(paste(c(i, par_grid[i, , drop = FALSE], 
         round(r2_train, 4), round(r2[i], 4)), collapse = "\t"), 
-        ifelse(r2[i] > max(r2, na.rm = TRUE), "\t*\n", "\n")))
+        ifelse(r2[i] >= max(r2, na.rm = TRUE), "\t*\n", "\n")))
     }
     
     idx_optimal <- which.max(r2)
