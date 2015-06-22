@@ -19,15 +19,15 @@ write_config <- function(filename_model, filename_features,
     function(s) gsub(",missing=(.*)$", "", gsub("^(\t+)", "", s)), character(1)))
 
   features <- c()
-  tree_index <- 0
+  tree_index <- -1
   for (line in content_model) {
     # Indicate a start of a new tree.
     if (grepl("^booster", line)) {
-      tree_index <- as.integer(gsub("[^0-9]", "", line)) + 1  
+      tree_index <- as.integer(gsub("[^0-9]", "", line))
       next
     }
     # Make sure a specific tree is worked on.
-    if (tree_index == 0) next
+    if (tree_index < 0) next
     filename_tree <- paste(filename_tree_prefix, as.character(tree_index), sep = ".")
     # Parse the line.
     node <- sub(":(.*)", "", line)
