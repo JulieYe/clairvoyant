@@ -6,7 +6,7 @@
 \usage{
 evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6,
   subsample = 0.75, colsample_bytree = 0.75, nthread, output = FALSE,
-  model_filename, feature_filename, dep_var = "Change")
+  model_filename, model_filename_bin, feature_filename, dep_var = "Change")
 }
 \arguments{
 \item{dat_tr}{data.frame.}
@@ -28,6 +28,8 @@ evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6,
 \item{output}{logical. Whether to save the model as texts.}
 
 \item{model_filename}{character. Text file to save the model.}
+
+\item{model_filename_bin}{character. Binary file to save the model.}
 
 \item{feature_filename}{character. Text file to save the features.}
 

@@ -80,12 +80,14 @@ load_data <- function(dir_data, sep, horizon,
 #' @param nthread integer. Number of threads.
 #' @param output logical. Whether to save the model as texts.
 #' @param model_filename character. Text file to save the model.
+#' @param model_filename_bin character. Binary file to save the model.
 #' @param feature_filename character. Text file to save the features.
 #' @param dep_var character. Name of dependent variable.
 #' @export
 evaluate_model <- function(dat_tr, dat_ts, 
   n_trees = 500, eta = 0.001, max_depth = 6, subsample = 0.75, colsample_bytree = 0.75, 
-  nthread, output = FALSE, model_filename, feature_filename, dep_var = "Change") {
+  nthread, output = FALSE, model_filename, model_filename_bin, feature_filename, 
+  dep_var = "Change") {
 
   stopifnot(require(xgboost))
 
@@ -165,6 +167,7 @@ evaluate_model <- function(dat_tr, dat_ts,
 
     # Save the model
     xgboost::xgb.dump(bst, model_filename)
+    xgboost::xgb.save(bst, model_filename_bin)
 
     # Save the features
     names_to_save <- colnames(dat[, !colnames(dat) %in% c("Change")]) 
