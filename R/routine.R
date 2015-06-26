@@ -99,9 +99,9 @@ evaluate_model <- function(dat_tr, dat_ts,
   }
 
   dtrain <- xgboost::xgb.DMatrix(as.matrix(dat_tr[, !colnames(dat_tr) %in% c("Change")]), 
-    label = dat_tr$Change)
+    label = dat_tr$Change, missing = NA)
   dtest <- xgboost::xgb.DMatrix(as.matrix(dat_ts[, !colnames(dat_ts) %in% c("Change")]), 
-    label = dat_ts$Change)
+    label = dat_ts$Change, missing = NA)
 
   if (length(n_trees) > 1 || length(eta) > 1 || length(max_depth) > 1 ||
       length(subsample) > 1 || length(colsample_bytree) > 1) {
@@ -160,7 +160,7 @@ evaluate_model <- function(dat_tr, dat_ts,
   if (isTRUE(output)) {
     dat <- rbind(dat_tr, dat_ts)
     dfull <- xgboost::xgb.DMatrix(as.matrix(dat[, !colnames(dat) %in% c("Change")]), 
-      label = dat$Change)
+      label = dat$Change, missing = NA)
     bst <- xgboost::xgb.train(param, dfull, n_trees)
     pfull  <- xgboost::predict(bst, dfull)
     cat(paste0("Full-sample R2: ", 
