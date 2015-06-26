@@ -117,7 +117,8 @@ evaluate_model <- function(dat_tr, dat_ts,
         subsample = par_grid[i, "subsample"], 
         colsample_bytree = par_grid[i, "colsample_bytree"],
         silent = 1, objective='reg:linear',
-        nthread = ifelse(missing(nthread), parallel::detectCores(), 1))
+        nthread = ifelse(missing(nthread), parallel::detectCores(), 1),
+        base_score = 0)
       bst <- xgboost::xgb.train(param, dtrain, par_grid[i, "n_trees"])
       ptrain <- xgboost::predict(bst, dtrain)
       ptest <- xgboost::predict(bst, dtest)
@@ -145,7 +146,7 @@ evaluate_model <- function(dat_tr, dat_ts,
 
   param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
     colsample_bytree = colsample_bytree, silent = 1, objective='reg:linear',
-    nthread = ifelse(missing(nthread), parallel::detectCores(), 1))
+    nthread = ifelse(missing(nthread), parallel::detectCores(), 1), base_score = 0)
   bst <- xgboost::xgb.train(param, dtrain, n_trees)
 
   ptrain <- xgboost::predict(bst, dtrain)
