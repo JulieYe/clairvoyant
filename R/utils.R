@@ -1,12 +1,12 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-#' Write raw model and feature files to separate config files.
+#' Write raw model and feature files to separate config files for xgboost framework.
 #' @param filename_model character. The name of the raw model file.
 #' @param filename_features character. The name of the raw features file.
 #' @param filename_tree_prefix character. The prefix path of the config files of trees.
 #' @param filename_features_effective character. THe name of the effective features file.
 #' @export
-write_config <- function(filename_model, filename_features, 
+write_config_xgboost <- function(filename_model, filename_features, 
   filename_tree_prefix, filename_features_effective) {
   if (!file.exists(filename_model) ||
       !file.exists(filename_features)) {
@@ -37,7 +37,7 @@ write_config <- function(filename_model, filename_features,
       split_value <- strsplit(rest, "=")[[1]][2]
       left_child <- "0"
     } else {
-      rest <- gsub("([[:alpha:]]|=|\\[|\\])", "", rest)
+      rest <- gsub("(yes=|no=|missing=|f|\\[|\\])", "", rest)
       splits <- strsplit(rest, " ")[[1]]
       splits1 <- strsplit(splits[1], "<")[[1]]
       feature <- splits1[1]
