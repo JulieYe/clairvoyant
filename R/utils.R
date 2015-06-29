@@ -10,8 +10,11 @@ write_config_xgboost <- function(filename_model, filename_features,
   filename_tree_prefix, filename_features_effective) {
   if (!file.exists(filename_model) ||
       !file.exists(filename_features)) {
+    cat("Config files do not exist\n")
     return(False)
   }
+
+  unlink(paste0(filename_tree_prefix, ".*"))
 
   content_model <- readLines(filename_model)
   # Clean up a line a little bit.
@@ -54,12 +57,54 @@ write_config_xgboost <- function(filename_model, filename_features,
   }
 
   content_features <- readLines(filename_features)
+  unlink(filename_features_effective)
   for (line in content_features) {
     if (as.integer(strsplit(line, ":")[[1]][2]) %in% features) {
       cat(paste0(line, "\n"), file = filename_features_effective, append = TRUE)
     }
   }
+
+  dir_trees <- stringr::str_replace(filename_tree_prefix, "tree$", "")
+  if (!file.exists(dir_trees)) {
+    cat("Tree config files do not exist\n")
+    return(False)
+  }
+
+  cleanup_config_xgboost(dir_trees, filename_features_effective)
+
   TRUE
+}
+
+cleanup_config_xgboost <- function(dir_trees, filename_features) {
+
+  content_features <- readLines(filename_features)
+  unlink(filename_features)
+  dict <- list()
+  for (i in seq_along(content_features)) {
+    line_splitted <- strsplit(content_features[i], ":")[[1]]
+    dict[[line_splitted[2]]] <- as.character(i - 1)
+    line_splitted[2] <- as.character(i - 1)
+    cat(paste0(paste(line_splitted, collapse = ":"), "\n"), 
+      file = filename_features, append = TRUE)
+  }
+
+  for (each_tree in list.files(dir_trees)) {
+    filename_tree <- file.path(dir_trees, each_tree)
+    lines <- readLines(filename_tree)
+    unlink(filename_tree)
+    for (line in lines) {
+      line_splitted <- strsplit(line, ",")[[1]]
+      if (as.integer(line_splitted[2]) > 0) {
+        line_splitted[2] <- dict[[line_splitted[2]]]
+        cat(paste0(paste(line_splitted, collapse = ","), "\n"), 
+          file = filename_tree, append = TRUE)
+      } else {
+        cat(paste0(line, "\n"), file = filename_tree, append = TRUE)
+      }
+    }
+  }
+
+  invisible(NULL)
 }
 
 dual_scale_plot <- function(df, x = 'index', y1, y2, filepath ) {
