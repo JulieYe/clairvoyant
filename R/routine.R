@@ -63,6 +63,8 @@ load_data <- function(dir_data, sep, horizon,
     }
     if (isTRUE(verbose)) print(paste0("Parsed ", filename))
   }
+  cat("Response variable summary:\n")
+  print(summary(round(dat$Change / ticksize)))
   set.seed(seed)
   id_tr <- caret::createDataPartition(factor(round(dat$Change / ticksize)), 
     p = trainpct, list = FALSE, times = 1)[, 1]
