@@ -88,21 +88,23 @@ cleanup_config_xgboost <- function(dir_trees, filename_features) {
       file = filename_features, append = TRUE)
   }
 
-  for (each_tree in list.files(dir_trees)) {
-    filename_tree <- file.path(dir_trees, each_tree)
-    lines <- readLines(filename_tree)
-    unlink(filename_tree)
-    for (line in lines) {
-      line_splitted <- strsplit(line, ",")[[1]]
-      if (as.integer(line_splitted[2]) > 0) {
-        line_splitted[2] <- dict[[line_splitted[2]]]
-        cat(paste0(paste(line_splitted, collapse = ","), "\n"), 
-          file = filename_tree, append = TRUE)
-      } else {
-        cat(paste0(line, "\n"), file = filename_tree, append = TRUE)
+  parallel::mclapply(list.files(dir_trees),
+    function(f) {
+      filename_tree <- file.path(dir_trees, f)
+      lines <- readLines(filename_tree)
+      unlink(filename_tree)
+      for (line in lines) {
+        line_splitted <- strsplit(line, ",")[[1]]
+        if (as.integer(line_splitted[2]) > 0) {
+          line_splitted[2] <- dict[[line_splitted[2]]]
+          cat(paste0(paste(line_splitted, collapse = ","), "\n"), 
+            file = filename_tree, append = TRUE)
+        } else {
+          cat(paste0(line, "\n"), file = filename_tree, append = TRUE)
+        }
       }
-    }
-  }
+    }, mc.cores = parallel::detectCores()
+  )
 
   invisible(NULL)
 }
