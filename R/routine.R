@@ -113,7 +113,7 @@ evaluate_model <- function(dat_tr, dat_ts,
 
     r2 <- rep(NA, nrow(par_grid))
 
-    header = paste(c("i", colnames(par_grid), "R2_tr", "R2_ts", "optimality\n"), collapse = "\t")
+    header = paste(c("i", colnames(par_grid), "R2_tr", "R2_ts", "optimality\n"), collapse = " ")
     if (missing(grid_search_filename)) {
       cat(header)
     } else {
