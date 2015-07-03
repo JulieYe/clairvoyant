@@ -113,8 +113,12 @@ evaluate_model <- function(dat_tr, dat_ts,
 
     r2 <- rep(NA, nrow(par_grid))
 
-    cat(paste(c("i", colnames(par_grid), "R2_tr", "R2_ts", "optimality\n"), collapse = "\t"),
-      file = grid_search_filename, append = TRUE)
+    header = paste(c("i", colnames(par_grid), "R2_tr", "R2_ts", "optimality\n"), collapse = "\t")
+    if (missing(grid_search_filename)) {
+      cat(header)
+    } else {
+      cat(header, file = grid_search_filename, append = TRUE)
+    }
     for (i in seq_len(nrow(par_grid))) {
       param <- list(eta = par_grid[i, "eta"],
         max.depth = par_grid[i, "max_depth"], 
@@ -128,10 +132,15 @@ evaluate_model <- function(dat_tr, dat_ts,
       ptest <- xgboost::predict(bst, dtest)
       r2_train <- 1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)
       r2[i] <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
-      cat(paste0(paste(c(i, par_grid[i, , drop = FALSE], 
+
+      line <- paste0(paste(c(i, par_grid[i, , drop = FALSE], 
         round(r2_train, 4), round(r2[i], 4)), collapse = "\t"), 
-        ifelse(r2[i] >= max(r2, na.rm = TRUE), "\t*\n", "\n")),
-        file = grid_search_filename, append = TRUE)
+        ifelse(r2[i] >= max(r2, na.rm = TRUE), "\t*\n", "\n"))
+      if (missing(grid_search_filename)) {
+        cat(line)
+      } else {
+        cat(line, file = grid_search_filename, append = TRUE)
+      }
     }
     
     idx_optimal <- which.max(r2)
@@ -144,10 +153,14 @@ evaluate_model <- function(dat_tr, dat_ts,
     max_depth <- par_grid[idx_optimal, "max_depth"]
     subsample <- par_grid[idx_optimal, "subsample"]
     colsample_bytree <- par_grid[idx_optimal, "colsample_bytree"]
-    cat(paste0("n_trees: ", n_trees, ", eta: ", eta,
+    line <- paste0("n_trees: ", n_trees, ", eta: ", eta,
       ", max_depth: ", max_depth, ", subsample: ", subsample,
-      ", colsample_bytree: ", colsample_bytree, "\n"), 
-      file = grid_search_filename, append = TRUE)
+      ", colsample_bytree: ", colsample_bytree, "\n")
+    if (missing(grid_search_filename)) {
+      cat(line)
+    } else {
+      cat(line, file = grid_search_filename, append = TRUE)
+    }
   }
 
   param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
@@ -156,13 +169,18 @@ evaluate_model <- function(dat_tr, dat_ts,
   bst <- xgboost::xgb.train(param, dtrain, n_trees)
 
   ptrain <- xgboost::predict(bst, dtrain)
-  cat(paste0("In-sample R2: ", 
-    1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2), "\n"),
-    file = grid_search_filename, append = TRUE)
   ptest <- xgboost::predict(bst, dtest)
-  cat(paste0("Out-of-sample R2 ", 
-    1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2), "\n"),
-    file = grid_search_filename, append = TRUE)
+  line_insample <- paste0("In-sample R2: ", 
+    1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2), "\n")
+  line_outofsample <- paste0("Out-of-sample R2 ", 
+    1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2), "\n")
+  if (missing(grid_search_filename)) {
+    cat(line_insample)
+    cat(line_outofsample)
+  } else {
+    cat(line_insample, file = grid_search_filename, append = TRUE)
+    cat(line_outofsample, file = grid_search_filename, append = TRUE)
+  }
 
   # Write to config file.
   if (isTRUE(output)) {
@@ -171,9 +189,13 @@ evaluate_model <- function(dat_tr, dat_ts,
       label = dat$Change, missing = NA)
     bst <- xgboost::xgb.train(param, dfull, n_trees)
     pfull  <- xgboost::predict(bst, dfull)
-    cat(paste0("Full-sample R2: ", 
-      1 - sum((dat$Change - pfull) ^ 2) / sum(dat$Change ^ 2), "\n"),
-      file = grid_search_filename, append = TRUE)
+    line <- paste0("Full-sample R2: ", 
+      1 - sum((dat$Change - pfull) ^ 2) / sum(dat$Change ^ 2), "\n")
+    if (missing(grid_search_filename)) {
+      cat(line)
+    } else {
+      cat(line, file = grid_search_filename, append = TRUE)
+    }
 
     # Save the model in text format.
     unlink(model_filename)
