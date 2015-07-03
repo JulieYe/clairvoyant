@@ -161,25 +161,35 @@ evaluate_model <- function(dat_tr, dat_ts,
     } else {
       cat(line, file = grid_search_filename, append = TRUE)
     }
-  }
-
-  param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
-    colsample_bytree = colsample_bytree, silent = 1, objective='reg:linear',
-    nthread = ifelse(missing(nthread), parallel::detectCores(), 1), base_score = 0)
-  bst <- xgboost::xgb.train(param, dtrain, n_trees)
-
-  ptrain <- xgboost::predict(bst, dtrain)
-  ptest <- xgboost::predict(bst, dtest)
-  line_insample <- paste0("In-sample R2: ", 
-    1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2), "\n")
-  line_outofsample <- paste0("Out-of-sample R2 ", 
-    1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2), "\n")
-  if (missing(grid_search_filename)) {
-    cat(line_insample)
-    cat(line_outofsample)
   } else {
-    cat(line_insample, file = grid_search_filename, append = TRUE)
-    cat(line_outofsample, file = grid_search_filename, append = TRUE)
+    par_grid <- list(n_trees = n_trees, eta = eta, max_depth = max_depth, 
+      subsample = subsample, colsample_bytree = colsample_bytree)
+
+    header = paste(c("i", names(par_grid), "R2_tr", "R2_ts\n"), collapse = " ")
+    if (missing(grid_search_filename)) {
+      cat(header)
+    } else {
+      cat(header, file = grid_search_filename, append = TRUE)
+    }
+
+    param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
+        colsample_bytree = colsample_bytree, silent = 1, objective='reg:linear',
+        nthread = ifelse(missing(nthread), parallel::detectCores(), 1), base_score = 0)
+    bst <- xgboost::xgb.train(param, dtrain, n_trees)
+
+    ptrain <- xgboost::predict(bst, dtrain)
+    ptest <- xgboost::predict(bst, dtest)
+
+    r2_train <- 1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)
+    r2_test <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
+
+    line <- paste0(paste(c(i, unlist(par_grid), 
+      round(r2_train, 4), round(r2_test, 4)), collapse = "\t"), "\n")
+    if (missing(grid_search_filename)) {
+      cat(line)
+    } else {
+      cat(line, file = grid_search_filename, append = TRUE)
+    }
   }
 
   # Write to config file.
