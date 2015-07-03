@@ -84,12 +84,13 @@ load_data <- function(dir_data, sep, horizon,
 #' @param model_filename character. Text file to save the model.
 #' @param model_filename_bin character. Binary file to save the model.
 #' @param feature_filename character. Text file to save the features.
+#' @param grid_search_filename character. Output for grid searching.
 #' @param dep_var character. Name of dependent variable.
 #' @export
 evaluate_model <- function(dat_tr, dat_ts, 
   n_trees = 500, eta = 0.001, max_depth = 6, subsample = 0.75, colsample_bytree = 0.75, 
   nthread, output = FALSE, model_filename, model_filename_bin, feature_filename, 
-  dep_var = "Change") {
+  grid_search_filename, dep_var = "Change") {
 
   stopifnot(require(xgboost))
 
@@ -112,7 +113,8 @@ evaluate_model <- function(dat_tr, dat_ts,
 
     r2 <- rep(NA, nrow(par_grid))
 
-    cat(paste(c("i", colnames(par_grid), "R2_tr R2_ts\n"), collapse = " "))
+    cat(paste(c("i", colnames(par_grid), "R2_tr", "R2_ts", "optimality\n"), collapse = "\t"),
+      file = grid_search_filename, append = TRUE)
     for (i in seq_len(nrow(par_grid))) {
       param <- list(eta = par_grid[i, "eta"],
         max.depth = par_grid[i, "max_depth"], 
@@ -128,7 +130,8 @@ evaluate_model <- function(dat_tr, dat_ts,
       r2[i] <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
       cat(paste0(paste(c(i, par_grid[i, , drop = FALSE], 
         round(r2_train, 4), round(r2[i], 4)), collapse = "\t"), 
-        ifelse(r2[i] >= max(r2, na.rm = TRUE), "\t*\n", "\n")))
+        ifelse(r2[i] >= max(r2, na.rm = TRUE), "\t*\n", "\n")),
+        file = grid_search_filename, append = TRUE)
     }
     
     idx_optimal <- which.max(r2)
@@ -143,7 +146,8 @@ evaluate_model <- function(dat_tr, dat_ts,
     colsample_bytree <- par_grid[idx_optimal, "colsample_bytree"]
     cat(paste0("n_trees: ", n_trees, ", eta: ", eta,
       ", max_depth: ", max_depth, ", subsample: ", subsample,
-      ", colsample_bytree: ", colsample_bytree, "\n"))
+      ", colsample_bytree: ", colsample_bytree, "\n"), 
+      file = grid_search_filename, append = TRUE)
   }
 
   param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
@@ -153,10 +157,12 @@ evaluate_model <- function(dat_tr, dat_ts,
 
   ptrain <- xgboost::predict(bst, dtrain)
   cat(paste0("In-sample R2: ", 
-    1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2), "\n"))
+    1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2), "\n"),
+    file = grid_search_filename, append = TRUE)
   ptest <- xgboost::predict(bst, dtest)
   cat(paste0("Out-of-sample R2 ", 
-    1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2), "\n"))
+    1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2), "\n"),
+    file = grid_search_filename, append = TRUE)
 
   # Write to config file.
   if (isTRUE(output)) {
@@ -166,21 +172,24 @@ evaluate_model <- function(dat_tr, dat_ts,
     bst <- xgboost::xgb.train(param, dfull, n_trees)
     pfull  <- xgboost::predict(bst, dfull)
     cat(paste0("Full-sample R2: ", 
-      1 - sum((dat$Change - pfull) ^ 2) / sum(dat$Change ^ 2), "\n"))
+      1 - sum((dat$Change - pfull) ^ 2) / sum(dat$Change ^ 2), "\n"),
+      file = grid_search_filename, append = TRUE)
 
-    # Save the model
+    # Save the model in text format.
+    unlink(model_filename)
     xgboost::xgb.dump(bst, model_filename)
+
+    # Save the model in binary format.
+    unlink(model_filename_bin)
     xgboost::xgb.save(bst, model_filename_bin)
 
     # Save the features
     names_to_save <- colnames(dat[, !colnames(dat) %in% c("Change")]) 
+    unlink(feature_filename)
     for (i in seq_along(names_to_save)) {
-      if (i == 1) {
-        cat(paste0(names_to_save[i], ":", i - 1, "\n"), file = feature_filename, append = FALSE)
-      } else {
-        cat(paste0(names_to_save[i], ":", i - 1, "\n"), file = feature_filename, append = TRUE)
-      }
+      cat(paste0(names_to_save[i], ":", i - 1, "\n"), file = feature_filename, append = TRUE)
     }
   }
+
   invisible(NULL)
 }
