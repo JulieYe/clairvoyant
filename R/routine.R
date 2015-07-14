@@ -84,13 +84,17 @@ load_data <- function(dir_data, sep, horizon,
 #' @param model_filename character. Text file to save the model.
 #' @param model_filename_bin character. Binary file to save the model.
 #' @param feature_filename character. Text file to save the features.
+#' @param filename_test_x character. File name of test data set (features).
+#' @param filename_test_y character. File name of test data set (response).
 #' @param grid_search_filename character. Output for grid searching.
 #' @param dep_var character. Name of dependent variable.
+#' @param n_test_samples integer. Number of samples for unit tests.
 #' @export
 evaluate_model <- function(dat_tr, dat_ts, 
   n_trees = 500, eta = 0.001, max_depth = 6, subsample = 0.75, colsample_bytree = 0.75, 
   nthread, output = FALSE, model_filename, model_filename_bin, feature_filename, 
-  grid_search_filename, dep_var = "Change") {
+  filename_test_x, filename_test_y,
+  grid_search_filename, dep_var = "Change", n_test_samples = 10) {
 
   stopifnot(require(xgboost))
 
@@ -220,6 +224,17 @@ evaluate_model <- function(dat_tr, dat_ts,
     unlink(feature_filename)
     for (i in seq_along(names_to_save)) {
       cat(paste0(names_to_save[i], ":", i - 1, "\n"), file = feature_filename, append = TRUE)
+    }
+
+    # Save the unit test data randomly
+    n_test_samples <- min(n_test_samples, nrow(dat))
+    indices <- sample(nrow(dat), n_test_samples)
+    unlink(filename_test_x)
+    unlink(filename_test_y)
+    for (i in indices) {
+      cat(paste0(paste(dat[i, !colnames(dat) %in% c("Change")], collapse = ","), "\n"), 
+        file = filename_test_x, append = TRUE)
+      cat(paste0(pfull[i], "\n"), file = filename_test_x, append = TRUE)
     }
   }
 

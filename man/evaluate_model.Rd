@@ -6,8 +6,9 @@
 \usage{
 evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6,
   subsample = 0.75, colsample_bytree = 0.75, nthread, output = FALSE,
-  model_filename, model_filename_bin, feature_filename, grid_search_filename,
-  dep_var = "Change")
+  model_filename, model_filename_bin, feature_filename, filename_test_x,
+  filename_test_y, grid_search_filename, dep_var = "Change",
+  n_test_samples = 10)
 }
 \arguments{
 \item{dat_tr}{data.frame.}
@@ -34,9 +35,15 @@ evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6,
 
 \item{feature_filename}{character. Text file to save the features.}
 
+\item{filename_test_x}{character. File name of test data set (features).}
+
+\item{filename_test_y}{character. File name of test data set (response).}
+
 \item{grid_search_filename}{character. Output for grid searching.}
 
 \item{dep_var}{character. Name of dependent variable.}
+
+\item{n_test_samples}{integer. Number of samples for unit tests.}
 }
 \description{
 Evaluate the model on training data set and output the performance.
