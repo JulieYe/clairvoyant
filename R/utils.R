@@ -4,12 +4,19 @@
 #' @param filename_model character. The name of the raw model file.
 #' @param filename_features character. The name of the raw features file.
 #' @param filename_tree_prefix character. The prefix path of the config files of trees.
-#' @param filename_features_effective character. THe name of the effective features file.
+#' @param filename_features_effective character. The name of the effective features file.
+#' @param rds_x character. RDS file name of test data set (features).
+#' @param rds_y character. RDS file name of test data set (response).
+#' @param filename_test_x character. The name of test data set (features).
+#' @param filename_test_y character. The name of test data set (response).
 #' @export
 write_config_xgboost <- function(filename_model, filename_features, 
-  filename_tree_prefix, filename_features_effective) {
+  filename_tree_prefix, filename_features_effective,
+  rds_x, rds_y, filename_test_x, filename_test_y) {
   if (!file.exists(filename_model) ||
-      !file.exists(filename_features)) {
+      !file.exists(filename_features) || 
+      !file.exists(rds_x) || 
+      !file.exists(rd_y)) {
     cat("Config files do not exist\n")
     return(False)
   }
@@ -70,16 +77,19 @@ write_config_xgboost <- function(filename_model, filename_features,
     return(False)
   }
 
-  cleanup_config_xgboost(dir_trees, filename_features_effective)
+  cleanup_config_xgboost(dir_trees, filename_features_effective, features,
+    rds_x, rds_y, filename_test_x, filename_test_y)
 
   TRUE
 }
 
-cleanup_config_xgboost <- function(dir_trees, filename_features) {
+cleanup_config_xgboost <- function(dir_trees, filename_features, features,
+  rds_x, rds_y, filename_test_x, filename_test_y) {
 
   content_features <- readLines(filename_features)
   unlink(filename_features)
   dict <- list()
+  removes <- c()
   for (i in seq_along(content_features)) {
     line_splitted <- strsplit(content_features[i], ":")[[1]]
     dict[[line_splitted[2]]] <- as.character(i - 1)
@@ -105,6 +115,17 @@ cleanup_config_xgboost <- function(dir_trees, filename_features) {
       }
     }, mc.cores = parallel::detectCores()
   )
+
+  dat_x <- readRDS(rds_x)
+  features <- vapply(features, function(x) x + 1, numeric(1))
+  unlink(filename_test_x)
+  for (i in 1:nrow(dat_x)) {
+    cat(paste0(paste(dat[i, features], collapse = ","), "\n"), 
+        file = filename_test_x, append = TRUE)
+  }
+  dat_y <- readRDS(rds_y)
+  unlink(filename_test_y)
+  cat(paste(dat_y, collapse = "\n"), file = filename_test_x, append = TRUE)
 
   invisible(NULL)
 }

@@ -5,7 +5,7 @@
 \title{Write raw model and feature files to separate config files for xgboost framework.}
 \usage{
 write_config_xgboost(filename_model, filename_features, filename_tree_prefix,
-  filename_features_effective)
+  filename_features_effective, rds_x, rds_y, filename_test_x, filename_test_y)
 }
 \arguments{
 \item{filename_model}{character. The name of the raw model file.}
@@ -14,7 +14,15 @@ write_config_xgboost(filename_model, filename_features, filename_tree_prefix,
 
 \item{filename_tree_prefix}{character. The prefix path of the config files of trees.}
 
-\item{filename_features_effective}{character. THe name of the effective features file.}
+\item{filename_features_effective}{character. The name of the effective features file.}
+
+\item{rds_x}{character. RDS file name of test data set (features).}
+
+\item{rds_y}{character. RDS file name of test data set (response).}
+
+\item{filename_test_x}{character. The name of test data set (features).}
+
+\item{filename_test_y}{character. The name of test data set (response).}
 }
 \description{
 Write raw model and feature files to separate config files for xgboost framework.
