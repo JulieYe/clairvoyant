@@ -120,7 +120,7 @@ cleanup_config_xgboost <- function(dir_trees, filename_features, features,
   features <- vapply(features, function(x) x + 1, numeric(1))
   unlink(filename_test_x)
   for (i in 1:nrow(dat_x)) {
-    cat(paste0(paste(dat[i, features], collapse = ","), "\n"), 
+    cat(paste0(paste(dat_x[i, features], collapse = ","), "\n"), 
         file = filename_test_x, append = TRUE)
   }
   dat_y <- readRDS(rds_y)
