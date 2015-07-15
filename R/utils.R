@@ -16,7 +16,7 @@ write_config_xgboost <- function(filename_model, filename_features,
   if (!file.exists(filename_model) ||
       !file.exists(filename_features) || 
       !file.exists(rds_x) || 
-      !file.exists(rd_y)) {
+      !file.exists(rds_y)) {
     cat("Config files do not exist\n")
     return(False)
   }
