@@ -125,7 +125,7 @@ cleanup_config_xgboost <- function(dir_trees, filename_features, features,
   }
   dat_y <- readRDS(rds_y)
   unlink(filename_test_y)
-  cat(paste(dat_y, collapse = "\n"), file = filename_test_x, append = TRUE)
+  cat(paste(dat_y, collapse = "\n"), file = filename_test_y, append = TRUE)
 
   invisible(NULL)
 }
