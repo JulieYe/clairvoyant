@@ -187,7 +187,7 @@ evaluate_model <- function(dat_tr, dat_ts,
     r2_train <- 1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)
     r2_test <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
 
-    line <- paste0(paste(c(i, unlist(par_grid), 
+    line <- paste0(paste(c(1, unlist(par_grid), 
       round(r2_train, 4), round(r2_test, 4)), collapse = "\t"), "\n")
     if (missing(grid_search_filename)) {
       cat(line)
