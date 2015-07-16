@@ -6,8 +6,8 @@
 \usage{
 evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6,
   subsample = 0.75, colsample_bytree = 0.75, nthread, output = FALSE,
-  model_filename, model_filename_bin, feature_filename, rds_x, rds_y,
-  grid_search_filename, dep_var = "Change", n_test_samples = 10)
+  output_path, fname_model, fname_model_bin, fname_feature, fname_rds_x,
+  fname_rds_y, fname_grid_search, dep_var = "Change", n_test_samples = 5000)
 }
 \arguments{
 \item{dat_tr}{data.frame.}
@@ -28,21 +28,23 @@ evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6,
 
 \item{output}{logical. Whether to save the model as texts.}
 
-\item{model_filename}{character. Text file to save the model.}
+\item{output_path}{character. Path to output directory.}
 
-\item{model_filename_bin}{character. Binary file to save the model.}
+\item{fname_model}{character. Text file to save the model.}
 
-\item{feature_filename}{character. Text file to save the features.}
+\item{fname_model_bin}{character. Binary file to save the model.}
 
-\item{rds_x}{character. RDS file name of test data set (features).}
+\item{fname_feature}{character. Text file to save the features.}
 
-\item{rds_y}{character. RDS file name of test data set (response).}
+\item{fname_rds_x}{character. RDS file name of test data set (features).}
 
-\item{grid_search_filename}{character. Output for grid searching.}
+\item{fname_rds_y}{character. RDS file name of test data set (response).}
+
+\item{fname_grid_search}{character. Output for grid searching.}
 
 \item{dep_var}{character. Name of dependent variable.}
 
-\item{n_test_samples}{integer. Number of samples for unit tests.}
+\item{n_test_samples}{integer. Number of samples for unit test.}
 }
 \description{
 Evaluate the model on training data set and output the performance.

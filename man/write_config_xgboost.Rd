@@ -4,25 +4,30 @@
 \alias{write_config_xgboost}
 \title{Write raw model and feature files to separate config files for xgboost framework.}
 \usage{
-write_config_xgboost(filename_model, filename_features, filename_tree_prefix,
-  filename_features_effective, rds_x, rds_y, filename_test_x, filename_test_y)
+write_config_xgboost(fname_model, fname_features, fname_tree_prefix,
+  fname_features_effective, fname_rds_x, fname_rds_y, fname_test_x,
+  fname_test_y)
 }
 \arguments{
-\item{filename_model}{character. The name of the raw model file.}
+\item{fname_model}{character. The name of the raw model file.}
 
-\item{filename_features}{character. The name of the raw features file.}
+\item{fname_features}{character. The name of the raw features file.}
 
-\item{filename_tree_prefix}{character. The prefix path of the config files of trees.}
+\item{fname_tree_prefix}{character. The prefix path of the config files of trees.}
 
-\item{filename_features_effective}{character. The name of the effective features file.}
+\item{fname_features_effective}{character. The name of the effective features file.}
 
-\item{rds_x}{character. RDS file name of test data set (features).}
+\item{fname_rds_x}{character. RDS file name of test data set (features).}
 
-\item{rds_y}{character. RDS file name of test data set (response).}
+\item{fname_rds_y}{character. RDS file name of test data set (response).}
 
-\item{filename_test_x}{character. The name of test data set (features).}
+\item{fname_test_x}{character. The name of test data set (features).}
 
-\item{filename_test_y}{character. The name of test data set (response).}
+\item{fname_test_y}{character. The name of test data set (response).}
+
+\item{input_path}{character. The path to input directory.}
+
+\item{output_path}{character. The path to output directory.}
 }
 \description{
 Write raw model and feature files to separate config files for xgboost framework.

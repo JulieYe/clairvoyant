@@ -1,29 +1,38 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
 #' Write raw model and feature files to separate config files for xgboost framework.
-#' @param filename_model character. The name of the raw model file.
-#' @param filename_features character. The name of the raw features file.
-#' @param filename_tree_prefix character. The prefix path of the config files of trees.
-#' @param filename_features_effective character. The name of the effective features file.
-#' @param rds_x character. RDS file name of test data set (features).
-#' @param rds_y character. RDS file name of test data set (response).
-#' @param filename_test_x character. The name of test data set (features).
-#' @param filename_test_y character. The name of test data set (response).
+#' @param input_path character. The path to input directory.
+#' @param fname_model character. The name of the raw model file.
+#' @param fname_features character. The name of the raw features file.
+#' @param fname_rds_x character. RDS file name of test data set (features).
+#' @param fname_rds_y character. RDS file name of test data set (response).
+#' @param output_path character. The path to output directory.
+#' @param fname_tree_prefix character. The prefix path of the config files of trees.
+#' @param fname_features_effective character. The name of the effective features file.
+#' @param fname_test_x character. The name of test data set (features).
+#' @param fname_test_y character. The name of test data set (response).
 #' @export
-write_config_xgboost <- function(filename_model, filename_features, 
-  filename_tree_prefix, filename_features_effective,
-  rds_x, rds_y, filename_test_x, filename_test_y) {
-  if (!file.exists(filename_model) ||
-      !file.exists(filename_features) || 
-      !file.exists(rds_x) || 
-      !file.exists(rds_y)) {
-    cat("Config files do not exist\n")
+write_config_xgboost <- function(fname_model, fname_features, 
+  fname_tree_prefix, fname_features_effective,
+  fname_rds_x, fname_rds_y, fname_test_x, fname_test_y) {
+  if (!all(file.exists(input_path, fname_model, fname_features, 
+          fname_rds_x, fname_rds_y, output_path))) {
+    cat("Config files or paths do not exist\n")
     return(False)
   }
 
-  unlink(paste0(filename_tree_prefix, ".*"))
+  fname_model <- file.path(input_path, fname_model)
+  fname_features <- file.path(input_path, fname_features)
+  fname_rds_x <- file.path(input_path, fname_rds_x)
+  fname_rds_y <- file.path(input_path, fname_rds_y)
+  fname_tree_prefix <- file.path(output_path, fname_tree_prefix)
+  fname_features_effective <- file.path(output_path, fname_features_effective)
+  fname_test_x <- file.path(output_path, fname_test_x)
+  fname_test_y <- file.path(output_path, fname_test_y)
 
-  content_model <- readLines(filename_model)
+  unlink(paste0(fname_tree_prefix, ".*"))
+
+  content_model <- readLines(fname_model)
   # Clean up a line a little bit.
   content_model <- unname(vapply(content_model,
     function(s) gsub(",missing=(.*)$", "", gsub("^(\t+)", "", s)), character(1)))
@@ -38,7 +47,7 @@ write_config_xgboost <- function(filename_model, filename_features,
     }
     # Make sure a specific tree is worked on.
     if (tree_index < 0) next
-    filename_tree <- paste(filename_tree_prefix, as.character(tree_index), sep = ".")
+    filename_tree <- paste(fname_tree_prefix, as.character(tree_index), sep = ".")
     # Parse the line.
     node <- sub(":(.*)", "", line)
     rest <- sub("^[0-9]+:", "", line)
@@ -63,31 +72,31 @@ write_config_xgboost <- function(filename_model, filename_features,
     }
   }
 
-  content_features <- readLines(filename_features)
-  unlink(filename_features_effective)
+  content_features <- readLines(fname_features)
+  unlink(fname_features_effective)
   for (line in content_features) {
     if (as.integer(strsplit(line, ":")[[1]][2]) %in% features) {
-      cat(paste0(line, "\n"), file = filename_features_effective, append = TRUE)
+      cat(paste0(line, "\n"), file = fname_features_effective, append = TRUE)
     }
   }
 
-  dir_trees <- stringr::str_replace(filename_tree_prefix, "tree$", "")
+  dir_trees <- stringr::str_replace(fname_tree_prefix, "tree$", "")
   if (!file.exists(dir_trees)) {
     cat("Tree config files do not exist\n")
     return(False)
   }
 
-  cleanup_config_xgboost(dir_trees, filename_features_effective, features,
-    rds_x, rds_y, filename_test_x, filename_test_y)
+  cleanup_config_xgboost(dir_trees, fname_features_effective, features,
+    fname_rds_x, fname_rds_y, fname_test_x, fname_test_y)
 
   TRUE
 }
 
-cleanup_config_xgboost <- function(dir_trees, filename_features, features,
-  rds_x, rds_y, filename_test_x, filename_test_y) {
+cleanup_config_xgboost <- function(dir_trees, fname_features, features,
+  fname_rds_x, fname_rds_y, fname_test_x, fname_test_y) {
 
-  content_features <- readLines(filename_features)
-  unlink(filename_features)
+  content_features <- readLines(fname_features)
+  unlink(fname_features)
   dict <- list()
   removes <- c()
   for (i in seq_along(content_features)) {
@@ -95,7 +104,7 @@ cleanup_config_xgboost <- function(dir_trees, filename_features, features,
     dict[[line_splitted[2]]] <- as.character(i - 1)
     line_splitted[2] <- as.character(i - 1)
     cat(paste0(paste(line_splitted, collapse = ":"), "\n"), 
-      file = filename_features, append = TRUE)
+      file = fname_features, append = TRUE)
   }
 
   parallel::mclapply(list.files(dir_trees),
@@ -116,16 +125,16 @@ cleanup_config_xgboost <- function(dir_trees, filename_features, features,
     }, mc.cores = parallel::detectCores()
   )
 
-  dat_x <- readRDS(rds_x)
+  dat_x <- readRDS(fname_rds_x)
   features <- vapply(features, function(x) x + 1, numeric(1))
-  unlink(filename_test_x)
+  unlink(fname_test_x)
   for (i in 1:nrow(dat_x)) {
     cat(paste0(paste(dat_x[i, features], collapse = ","), "\n"), 
-        file = filename_test_x, append = TRUE)
+        file = fname_test_x, append = TRUE)
   }
-  dat_y <- readRDS(rds_y)
-  unlink(filename_test_y)
-  cat(paste(dat_y, collapse = "\n"), file = filename_test_y, append = TRUE)
+  dat_y <- readRDS(fname_rds_y)
+  unlink(fname_test_y)
+  cat(paste(dat_y, collapse = "\n"), file = fname_test_y, append = TRUE)
 
   invisible(NULL)
 }

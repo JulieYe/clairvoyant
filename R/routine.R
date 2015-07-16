@@ -81,20 +81,20 @@ load_data <- function(dir_data, sep, horizon,
 #' @param colsample_bytree numeric. Percentage of column sampling.
 #' @param nthread integer. Number of threads.
 #' @param output logical. Whether to save the model as texts.
-#' @param model_filename character. Text file to save the model.
-#' @param model_filename_bin character. Binary file to save the model.
-#' @param feature_filename character. Text file to save the features.
-#' @param rds_x character. RDS file name of test data set (features).
-#' @param rds_y character. RDS file name of test data set (response).
-#' @param grid_search_filename character. Output for grid searching.
+#' @param output_path character. Path to output directory.
+#' @param fname_model character. Text file to save the model.
+#' @param fname_model_bin character. Binary file to save the model.
+#' @param fname_feature character. Text file to save the features.
+#' @param fname_rds_x character. RDS file name of test data set (features).
+#' @param fname_rds_y character. RDS file name of test data set (response).
+#' @param fname_grid_search character. Output for grid searching.
 #' @param dep_var character. Name of dependent variable.
-#' @param n_test_samples integer. Number of samples for unit tests.
+#' @param n_test_samples integer. Number of samples for unit test.
 #' @export
-evaluate_model <- function(dat_tr, dat_ts, 
-  n_trees = 500, eta = 0.001, max_depth = 6, subsample = 0.75, colsample_bytree = 0.75, 
-  nthread, output = FALSE, model_filename, model_filename_bin, feature_filename, 
-  rds_x, rds_y,
-  grid_search_filename, dep_var = "Change", n_test_samples = 10) {
+evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6, 
+    subsample = 0.75, colsample_bytree = 0.75, nthread, output = FALSE, output_path, 
+    fname_model, fname_model_bin, fname_feature, fname_rds_x, fname_rds_y, fname_grid_search, 
+    dep_var = "Change", n_test_samples = 5000) {
 
   stopifnot(require(xgboost))
 
@@ -118,10 +118,10 @@ evaluate_model <- function(dat_tr, dat_ts,
     r2 <- rep(NA, nrow(par_grid))
 
     header = paste(c("i", colnames(par_grid), "R2_tr", "R2_ts", "optimality\n"), collapse = " ")
-    if (missing(grid_search_filename)) {
+    if (missing(fname_grid_search)) {
       cat(header)
     } else {
-      cat(header, file = grid_search_filename, append = TRUE)
+      cat(header, file = file.path(output_path, fname_grid_search), append = TRUE)
     }
     for (i in seq_len(nrow(par_grid))) {
       param <- list(eta = par_grid[i, "eta"],
@@ -140,10 +140,10 @@ evaluate_model <- function(dat_tr, dat_ts,
       line <- paste0(paste(c(i, par_grid[i, , drop = FALSE], 
         round(r2_train, 4), round(r2[i], 4)), collapse = "\t"), 
         ifelse(r2[i] >= max(r2, na.rm = TRUE), "\t*\n", "\n"))
-      if (missing(grid_search_filename)) {
+      if (missing(fname_grid_search)) {
         cat(line)
       } else {
-        cat(line, file = grid_search_filename, append = TRUE)
+        cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
       }
     }
     
@@ -160,20 +160,20 @@ evaluate_model <- function(dat_tr, dat_ts,
     line <- paste0("n_trees: ", n_trees, ", eta: ", eta,
       ", max_depth: ", max_depth, ", subsample: ", subsample,
       ", colsample_bytree: ", colsample_bytree, "\n")
-    if (missing(grid_search_filename)) {
+    if (missing(fname_grid_search)) {
       cat(line)
     } else {
-      cat(line, file = grid_search_filename, append = TRUE)
+      cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
     }
   } else {
     par_grid <- list(n_trees = n_trees, eta = eta, max_depth = max_depth, 
       subsample = subsample, colsample_bytree = colsample_bytree)
 
     header = paste(c("i", names(par_grid), "R2_tr", "R2_ts\n"), collapse = " ")
-    if (missing(grid_search_filename)) {
+    if (missing(fname_grid_search)) {
       cat(header)
     } else {
-      cat(header, file = grid_search_filename, append = TRUE)
+      cat(header, file = file.path(output_path, fname_grid_search), append = TRUE)
     }
 
     param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
@@ -189,10 +189,10 @@ evaluate_model <- function(dat_tr, dat_ts,
 
     line <- paste0(paste(c(1, unlist(par_grid), 
       round(r2_train, 4), round(r2_test, 4)), collapse = "\t"), "\n")
-    if (missing(grid_search_filename)) {
+    if (missing(fname_grid_search)) {
       cat(line)
     } else {
-      cat(line, file = grid_search_filename, append = TRUE)
+      cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
     }
   }
 
@@ -205,32 +205,34 @@ evaluate_model <- function(dat_tr, dat_ts,
     pfull  <- xgboost::predict(bst, dfull)
     line <- paste0("Full-sample R2: ", 
       1 - sum((dat$Change - pfull) ^ 2) / sum(dat$Change ^ 2), "\n")
-    if (missing(grid_search_filename)) {
+    if (missing(fname_grid_search)) {
       cat(line)
     } else {
-      cat(line, file = grid_search_filename, append = TRUE)
+      cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
     }
 
     # Save the model in text format.
-    unlink(model_filename)
-    xgboost::xgb.dump(bst, model_filename)
+    unlink(file.path(output_path, fname_model))
+    xgboost::xgb.dump(bst, file.path(output_path, fname_model))
 
     # Save the model in binary format.
-    unlink(model_filename_bin)
-    xgboost::xgb.save(bst, model_filename_bin)
+    unlink(file.path(output_path, fname_model_bin))
+    xgboost::xgb.save(bst, file.path(output_path, fname_model_bin))
 
     # Save the features
     names_to_save <- colnames(dat[, !colnames(dat) %in% c("Change")]) 
-    unlink(feature_filename)
+    unlink(file.path(output_path, fname_feature))
     for (i in seq_along(names_to_save)) {
-      cat(paste0(names_to_save[i], ":", i - 1, "\n"), file = feature_filename, append = TRUE)
+      cat(paste0(names_to_save[i], ":", i - 1, "\n"), 
+          file = file.path(output_path, fname_feature), append = TRUE)
     }
 
     # Save the unit test data randomly
     n_test_samples <- min(n_test_samples, nrow(dat))
     indices <- sample(nrow(dat), n_test_samples)
-    saveRDS(dat[indices, !colnames(dat) %in% c("Change"), drop = FALSE], rds_x)
-    saveRDS(pfull[indices], rds_y)
+    saveRDS(dat[indices, !colnames(dat) %in% c("Change"), drop = FALSE], 
+        file.path(output_path, fname_rds_x))
+    saveRDS(pfull[indices], file.path(output_path, fname_rds_y))
   }
 
   invisible(NULL)
