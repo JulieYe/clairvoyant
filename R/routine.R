@@ -91,9 +91,11 @@ load_data <- function(dir_data, sep, horizon,
 #' @param dep_var character. Name of dependent variable.
 #' @param n_test_samples integer. Number of samples for unit test.
 #' @export
-evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6, 
+evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth = 7, 
     subsample = 0.75, colsample_bytree = 0.75, nthread, output = FALSE, output_path, 
-    fname_model, fname_model_bin, fname_feature, fname_rds_x, fname_rds_y, fname_grid_search, 
+    fname_model = "xgboost.model", fname_model_bin = "xgboost.model.bin", 
+    fname_feature = "xgboost.features", fname_rds_x = "tree.input.rds", 
+    fname_rds_y = "tree.output.rds", fname_grid_search, 
     dep_var = "Change", n_test_samples = 5000) {
 
   stopifnot(require(xgboost))

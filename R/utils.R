@@ -12,9 +12,11 @@
 #' @param fname_test_x character. The name of test data set (features).
 #' @param fname_test_y character. The name of test data set (response).
 #' @export
-write_config_xgboost <- function(fname_model, fname_features, 
-  fname_tree_prefix, fname_features_effective,
-  fname_rds_x, fname_rds_y, fname_test_x, fname_test_y) {
+write_config_xgboost <- function(input_path, fname_model = "xgboost.model", 
+  fname_features = "xgboost.features", fname_rds_x = "tree.input.rds", 
+  fname_rds_y = "tree.output.rds", output_path, fname_tree_prefix = "trees/tree",  
+  fname_features_effective = "xgboost.features.in.use",
+  fname_test_x = "tree.input", fname_test_y = "tree.output") {
   if (!all(file.exists(input_path, fname_model, fname_features, 
           fname_rds_x, fname_rds_y, output_path))) {
     cat("Config files or paths do not exist\n")

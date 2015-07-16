@@ -4,10 +4,12 @@
 \alias{evaluate_model}
 \title{Evaluate the model on training data set and output the performance.}
 \usage{
-evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.001, max_depth = 6,
+evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth = 7,
   subsample = 0.75, colsample_bytree = 0.75, nthread, output = FALSE,
-  output_path, fname_model, fname_model_bin, fname_feature, fname_rds_x,
-  fname_rds_y, fname_grid_search, dep_var = "Change", n_test_samples = 5000)
+  output_path, fname_model = "xgboost.model",
+  fname_model_bin = "xgboost.model.bin", fname_feature = "xgboost.features",
+  fname_rds_x = "tree.input.rds", fname_rds_y = "tree.output.rds",
+  fname_grid_search, dep_var = "Change", n_test_samples = 5000)
 }
 \arguments{
 \item{dat_tr}{data.frame.}
