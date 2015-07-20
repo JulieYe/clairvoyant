@@ -154,8 +154,8 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
       r2[i] <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
 
       for (j in seq_along(value_R2_decompose)) {
-        indices <- which(dat_ts$Change >= value_R2_decompose[[j]][1] & 
-            dat_ts$Change < value_R2_decompose[[j]][2])
+        indices <- which(abs(dat_ts$Change) >= value_R2_decompose[[j]][1] & 
+            abs(dat_ts$Change) < value_R2_decompose[[j]][2])
         if (length(indices) > 0) {
           var_noise <- sum((dat_ts$Change[indices] - ptest[indices]) ^ 2)
           var_total <- sum(dat_ts$Change[indices] ^ 2)
@@ -218,8 +218,8 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     r2_decompose <- rep(NA, length(value_R2_decompose))
 
     for (j in seq_along(value_R2_decompose)) {
-      indices <- which(dat_ts$Change >= value_R2_decompose[[j]][1] & 
-          dat_ts$Change < value_R2_decompose[[j]][2])
+      indices <- which(abs(dat_ts$Change) >= value_R2_decompose[[j]][1] & 
+          abs(dat_ts$Change) < value_R2_decompose[[j]][2])
       if (length(indices) > 0) {
         var_noise <- sum((dat_ts$Change[indices] - ptest[indices]) ^ 2)
         var_total <- sum(dat_ts$Change[indices] ^ 2)
