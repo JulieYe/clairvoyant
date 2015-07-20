@@ -9,7 +9,8 @@ evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth = 7,
   output_path, fname_model = "xgboost.model",
   fname_model_bin = "xgboost.model.bin", fname_feature = "xgboost.features",
   fname_rds_x = "tree.input.rds", fname_rds_y = "tree.output.rds",
-  fname_grid_search, dep_var = "Change", n_test_samples = 5000)
+  fname_grid_search, dep_var = "Change", n_test_samples = 5000,
+  dep_var_range)
 }
 \arguments{
 \item{dat_tr}{data.frame.}
@@ -47,6 +48,8 @@ evaluate_model(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth = 7,
 \item{dep_var}{character. Name of dependent variable.}
 
 \item{n_test_samples}{integer. Number of samples for unit test.}
+
+\item{dep_var_range}{numeric. Range of dep_var for R2.}
 }
 \description{
 Evaluate the model on training data set and output the performance.

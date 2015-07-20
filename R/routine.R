@@ -90,15 +90,21 @@ load_data <- function(dir_data, sep, horizon,
 #' @param fname_grid_search character. Output for grid searching.
 #' @param dep_var character. Name of dependent variable.
 #' @param n_test_samples integer. Number of samples for unit test.
+#' @param dep_var_range numeric. Range of dep_var for R2.
 #' @export
 evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth = 7, 
     subsample = 0.75, colsample_bytree = 0.75, nthread, output = FALSE, output_path, 
     fname_model = "xgboost.model", fname_model_bin = "xgboost.model.bin", 
     fname_feature = "xgboost.features", fname_rds_x = "tree.input.rds", 
     fname_rds_y = "tree.output.rds", fname_grid_search, 
-    dep_var = "Change", n_test_samples = 5000) {
+    dep_var = "Change", n_test_samples = 5000, dep_var_range) {
 
   stopifnot(require(xgboost))
+
+  if (missing(dep_var_range) || 
+      !is.vector(dep_var_range)) {
+    dep_var_range <- c(seq(0, 100, by = 5), Inf)
+  }
 
   id_0_var <- which(vapply(dat_tr, sd, numeric(1)) == 0)
   if (length(id_0_var) > 0) {
@@ -112,14 +118,22 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
   dtest <- xgboost::xgb.DMatrix(as.matrix(dat_ts[, !colnames(dat_ts) %in% c("Change")]), 
     label = dat_ts$Change, missing = NA)
 
+  header_R2_decompose <- vapply(1:(length(dep_var_range)-1), 
+    function(i) paste0("R2_ts_", dep_var_range[i], "_to_", dep_var_range[i+1]), 
+    character(1))
+  value_R2_decompose <- lapply(1:(length(dep_var_range)-1), 
+    function(i) c(dep_var_range[i], dep_var_range[i+1]))
+
   if (length(n_trees) > 1 || length(eta) > 1 || length(max_depth) > 1 ||
       length(subsample) > 1 || length(colsample_bytree) > 1) {
     par_grid <- expand.grid(list(n_trees = n_trees, eta = eta, max_depth = max_depth, 
       subsample = subsample, colsample_bytree = colsample_bytree))
 
     r2 <- rep(NA, nrow(par_grid))
+    r2_decompose <- rep(NA, length(value_R2_decompose))
 
-    header = paste(c("i", colnames(par_grid), "R2_tr", "R2_ts", "optimality\n"), collapse = " ")
+    header = paste(c("i", colnames(par_grid), "R2_tr", "R2_ts", 
+      header_R2_decompose, "optimality\n"), collapse = " ")
     if (missing(fname_grid_search)) {
       cat(header)
     } else {
@@ -139,8 +153,19 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
       r2_train <- 1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)
       r2[i] <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
 
+      for (j in seq_along(value_R2_decompose)) {
+        indices <- which(dat_ts$Change >= value_R2_decompose[[j]][1] & 
+            dat_ts$Change < value_R2_decompose[[j]][2])
+        if (length(indices) > 0) {
+          var_noise <- sum((dat_ts$Change[indices] - ptest[indices]) ^ 2)
+          var_total <- sum(dat_ts$Change[indices] ^ 2)
+          r2_decompose[j] <- 1 - var_noise / var_total
+        }
+      }
+
       line <- paste0(paste(c(i, par_grid[i, , drop = FALSE], 
-        round(r2_train, 4), round(r2[i], 4)), collapse = "\t"), 
+        round(r2_train, 4), round(r2[i], 4), 
+        vapply(r2_decompose, function(v) round(v, 4), numeric(1))), collapse = "\t"), 
         ifelse(r2[i] >= max(r2, na.rm = TRUE), "\t*\n", "\n"))
       if (missing(fname_grid_search)) {
         cat(line)
@@ -171,7 +196,8 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     par_grid <- list(n_trees = n_trees, eta = eta, max_depth = max_depth, 
       subsample = subsample, colsample_bytree = colsample_bytree)
 
-    header = paste(c("i", names(par_grid), "R2_tr", "R2_ts\n"), collapse = " ")
+    header = paste(c("i", names(par_grid), "R2_tr", "R2_ts", 
+      header_R2_decompose, "\n"), collapse = " ")
     if (missing(fname_grid_search)) {
       cat(header)
     } else {
@@ -189,8 +215,21 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     r2_train <- 1 - sum((dat_tr$Change - ptrain) ^ 2) / sum(dat_tr$Change ^ 2)
     r2_test <- 1 - sum((dat_ts$Change - ptest) ^ 2) / sum(dat_ts$Change ^ 2)
 
+    r2_decompose <- rep(NA, length(value_R2_decompose))
+
+    for (j in seq_along(value_R2_decompose)) {
+      indices <- which(dat_ts$Change >= value_R2_decompose[[j]][1] & 
+          dat_ts$Change < value_R2_decompose[[j]][2])
+      if (length(indices) > 0) {
+        var_noise <- sum((dat_ts$Change[indices] - ptest[indices]) ^ 2)
+        var_total <- sum(dat_ts$Change[indices] ^ 2)
+        r2_decompose[j] <- 1 - var_noise / var_total
+      }
+    }
+
     line <- paste0(paste(c(1, unlist(par_grid), 
-      round(r2_train, 4), round(r2_test, 4)), collapse = "\t"), "\n")
+      round(r2_train, 4), round(r2_test, 4), 
+      vapply(r2_decompose, function(v) round(v, 4), numeric(1))), collapse = "\t"), "\n")
     if (missing(fname_grid_search)) {
       cat(line)
     } else {
