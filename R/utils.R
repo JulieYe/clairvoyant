@@ -17,11 +17,6 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
   fname_rds_y = "tree.output.rds", output_path, fname_tree_prefix = "trees/tree",  
   fname_features_effective = "xgboost.features.in.use",
   fname_test_x = "tree.input", fname_test_y = "tree.output") {
-  if (!all(file.exists(input_path, fname_model, fname_features, 
-          fname_rds_x, fname_rds_y, output_path))) {
-    cat("Config files or paths do not exist\n")
-    return(False)
-  }
 
   fname_model <- file.path(input_path, fname_model)
   fname_features <- file.path(input_path, fname_features)
@@ -31,6 +26,12 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
   fname_features_effective <- file.path(output_path, fname_features_effective)
   fname_test_x <- file.path(output_path, fname_test_x)
   fname_test_y <- file.path(output_path, fname_test_y)
+
+  if (!all(file.exists(input_path, fname_model, fname_features, 
+          fname_rds_x, fname_rds_y, output_path))) {
+    cat("Config files or paths do not exist\n")
+    return(False)
+  }
 
   float_bounds <- float_minmax()
 
