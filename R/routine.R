@@ -141,12 +141,12 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     }
     for (i in seq_len(nrow(par_grid))) {
       param <- list(eta = par_grid[i, "eta"],
-        max.depth = par_grid[i, "max_depth"], 
-        subsample = par_grid[i, "subsample"], 
-        colsample_bytree = par_grid[i, "colsample_bytree"],
-        silent = 1, objective='reg:linear',
-        nthread = ifelse(missing(nthread), parallel::detectCores(), 1),
-        base_score = 0)
+                    max.depth = par_grid[i, "max_depth"], 
+                    subsample = par_grid[i, "subsample"], 
+                    colsample_bytree = par_grid[i, "colsample_bytree"],
+                    silent = 1, objective='reg:linear',
+                    nthread = ifelse(missing(nthread), parallel::detectCores(), 1),
+                    base_score = 0)
       bst <- xgboost::xgb.train(param, dtrain, par_grid[i, "n_trees"])
       ptrain <- xgboost::predict(bst, dtrain)
       ptest <- xgboost::predict(bst, dtest)
@@ -192,6 +192,14 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     } else {
       cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
     }
+    param <- list(eta = eta,
+                  max.depth = max_depth, 
+                  subsample = subsample, 
+                  colsample_bytree = colsample_bytree,
+                  silent = 1, 
+                  objective='reg:linear',
+                  nthread = ifelse(missing(nthread), parallel::detectCores(), 1),
+                  base_score = 0)
   } else {
     par_grid <- list(n_trees = n_trees, eta = eta, max_depth = max_depth, 
       subsample = subsample, colsample_bytree = colsample_bytree)
@@ -204,9 +212,14 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
       cat(header, file = file.path(output_path, fname_grid_search), append = TRUE)
     }
 
-    param <- list(eta = eta, max.depth = max_depth, subsample = subsample, 
-        colsample_bytree = colsample_bytree, silent = 1, objective='reg:linear',
-        nthread = ifelse(missing(nthread), parallel::detectCores(), 1), base_score = 0)
+    param <- list(eta = eta,
+                  max.depth = max_depth, 
+                  subsample = subsample, 
+                  colsample_bytree = colsample_bytree,
+                  silent = 1, 
+                  objective='reg:linear',
+                  nthread = ifelse(missing(nthread), parallel::detectCores(), 1),
+                  base_score = 0)
     bst <- xgboost::xgb.train(param, dtrain, n_trees)
 
     ptrain <- xgboost::predict(bst, dtrain)
