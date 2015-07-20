@@ -68,7 +68,7 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
       split_value <- splits1[2]
       left_child <- strsplit(splits[2], ",")[[1]][1]
     }
-    split_value <- as.character(bound_minmax(split_value, float_bounds))
+    split_value <- as.character(bound_minmax(as.numeric(split_value), float_bounds))
     # Write to config.
     cat(paste0(paste(node, feature, split_value, left_child, sep = ","), "\n"), 
       file = filename_tree, append = TRUE)
