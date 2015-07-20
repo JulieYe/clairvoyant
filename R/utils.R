@@ -32,6 +32,8 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
   fname_test_x <- file.path(output_path, fname_test_x)
   fname_test_y <- file.path(output_path, fname_test_y)
 
+  float_bounds <- float_minmax()
+
   unlink(paste0(fname_tree_prefix, ".*"))
 
   content_model <- readLines(fname_model)
@@ -65,6 +67,7 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
       split_value <- splits1[2]
       left_child <- strsplit(splits[2], ",")[[1]][1]
     }
+    split_value <- as.character(bound_minmax(split_value, float_bounds))
     # Write to config.
     cat(paste0(paste(node, feature, split_value, left_child, sep = ","), "\n"), 
       file = filename_tree, append = TRUE)
@@ -139,6 +142,20 @@ cleanup_config_xgboost <- function(dir_trees, fname_features, features,
   cat(paste(dat_y, collapse = "\n"), file = fname_test_y, append = TRUE)
 
   invisible(NULL)
+}
+
+float_minmax <- function() {
+  Rcpp::cppFunction("float float_min() { return std::numeric_limits<float>::min(); }")
+  Rcpp::cppFunction("float float_max() { return std::numeric_limits<float>::max(); }")
+  # I am not really interested in handling the boundaries.
+  c(float_min() * 10, float_max() / 10)
+}
+
+bound_minmax <- function(x, bounds) {
+  if (missing(bounds)) bounds <- float_minmax()
+  if (x > 0) min(bounds[2], max(bounds[1], x))  
+  else if (x < 0) max(-bounds[2], min(-bounds[1], x))  
+  else x
 }
 
 dual_scale_plot <- function(df, x = 'index', y1, y2, filepath ) {
