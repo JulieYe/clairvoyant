@@ -103,7 +103,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
 
   if (missing(dep_var_range) || 
       !is.vector(dep_var_range)) {
-    dep_var_range <- c(seq(0, 100, by = 5), Inf)
+    dep_var_range <- c(seq(0, 10, by = 2), Inf)
   }
 
   id_0_var <- which(vapply(dat_tr, sd, numeric(1)) == 0)
@@ -119,7 +119,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     label = dat_ts$Change, missing = NA)
 
   header_R2_decompose <- vapply(1:(length(dep_var_range)-1), 
-    function(i) paste0("R2_ts_", dep_var_range[i], "_to_", dep_var_range[i+1]), 
+    function(i) paste0("R2_", dep_var_range[i], "_", dep_var_range[i+1]), 
     character(1))
   value_R2_decompose <- lapply(1:(length(dep_var_range)-1), 
     function(i) c(dep_var_range[i], dep_var_range[i+1]))
