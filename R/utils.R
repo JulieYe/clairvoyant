@@ -101,6 +101,8 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
 cleanup_config_xgboost <- function(dir_trees, fname_features, features,
   fname_rds_x, fname_rds_y, fname_test_x, fname_test_y) {
 
+  float_bounds <- float_minmax()
+
   content_features <- readLines(fname_features)
   unlink(fname_features)
   dict <- list()
