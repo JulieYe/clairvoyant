@@ -5,14 +5,23 @@
 
 using namespace Rcpp;
 
-// timesTwo
-int timesTwo(int x);
-RcppExport SEXP clairvoyant_timesTwo(SEXP xSEXP) {
+// numeric_limits_min_float
+float numeric_limits_min_float();
+RcppExport SEXP clairvoyant_numeric_limits_min_float() {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< int >::type x(xSEXP);
-    __result = Rcpp::wrap(timesTwo(x));
+    __result = Rcpp::wrap(numeric_limits_min_float());
+    return __result;
+END_RCPP
+}
+// numeric_limits_max_float
+float numeric_limits_max_float();
+RcppExport SEXP clairvoyant_numeric_limits_max_float() {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    __result = Rcpp::wrap(numeric_limits_max_float());
     return __result;
 END_RCPP
 }

@@ -148,10 +148,8 @@ cleanup_config_xgboost <- function(dir_trees, fname_features, features,
 }
 
 float_minmax <- function() {
-  Rcpp::cppFunction("float float_min() { return std::numeric_limits<float>::min(); }")
-  Rcpp::cppFunction("float float_max() { return std::numeric_limits<float>::max(); }")
-  # I am not really interested in handling the boundaries.
-  c(float_min() * 10, float_max() / 10)
+  # I am not really interested in handling the boundaries so relax by a multiply of 10.
+  c(numeric_limits_min_float() * 10, numeric_limits_max_float() / 10)
 }
 
 bound_minmax <- function(x, bounds) {
