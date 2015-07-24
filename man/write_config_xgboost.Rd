@@ -6,10 +6,10 @@
 \usage{
 write_config_xgboost(input_path, fname_model = "xgboost.model",
   fname_features = "xgboost.features", fname_rds_x = "tree.input.rds",
-  fname_rds_y = "tree.output.rds", output_path,
-  fname_tree_prefix = "trees/tree",
-  fname_features_effective = "xgboost.features.in.use",
-  fname_test_x = "tree.input", fname_test_y = "tree.output")
+  fname_rds_y = "tree.output.rds", fname_test_x = "tree.input",
+  fname_test_y = "tree.output",
+  fname_features_effective = "xgboost.features.in.use", output_path,
+  fname_tree_prefix = "trees/tree", fname_features_header)
 }
 \arguments{
 \item{input_path}{character. The path to input directory.}
@@ -22,15 +22,17 @@ write_config_xgboost(input_path, fname_model = "xgboost.model",
 
 \item{fname_rds_y}{character. RDS file name of test data set (response).}
 
+\item{fname_test_x}{character. The name of test data set (features).}
+
+\item{fname_test_y}{character. The name of test data set (response).}
+
+\item{fname_features_effective}{character. The name of the effective features file.}
+
 \item{output_path}{character. The path to output directory.}
 
 \item{fname_tree_prefix}{character. The prefix path of the config files of trees.}
 
-\item{fname_features_effective}{character. The name of the effective features file.}
-
-\item{fname_test_x}{character. The name of test data set (features).}
-
-\item{fname_test_y}{character. The name of test data set (response).}
+\item{fname_features_header}{character. The absolute file name of features header.}
 }
 \description{
 Write raw model and feature files to separate config files for xgboost framework.

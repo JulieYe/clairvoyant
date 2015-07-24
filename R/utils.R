@@ -106,10 +106,10 @@ write_config_xgboost <- function(input_path,
 #' @param instrument_header character. Ticker head of isntrument.
 #' @param instrument_mapper list. The map between instruments.
 #' @export
-write_config_alpha <- function(fname_features_effective, output_path,
+write_config_alpha <- function(fname_features, output_path,
   instrument_header, instrument_mapper) {
 
-  if (!all(file.exists(fname_features_effective, output_path))) {
+  if (!all(file.exists(fname_features, output_path))) {
     cat("Config files or paths do not exist\n")
     return(False)
   }
@@ -121,13 +121,13 @@ write_config_alpha <- function(fname_features_effective, output_path,
 }
 
 # Ugly tedious hack.
-write_config_alpha_helper(fname_features, fname_header, 
+write_config_alpha_helper <- function(fname_features, fname_header, 
   instrument_header, instrument_mapper) {
 
   content <- readLines(fname_features)
   num_features <- length(content)
-  cat_append(paste0("#ifndef ", instrument_header, "_H\n", fname_header)
-  cat_append(paste0("#define ", instrument_header, "_H\n", file = fname_header)
+  cat_append(paste0("#ifndef ", instrument_header, "_H\n"), fname_header)
+  cat_append(paste0("#define ", instrument_header, "_H\n"), fname_header)
   cat_append("\n", fname_header)
   cat_append("#include <array>\n", fname_header)
   cat_append("\n", fname_header)
@@ -143,7 +143,7 @@ write_config_alpha_helper(fname_features, fname_header,
   cat_append(paste0("\tclass ", instrument_header, "<true>\n"), fname_header)
   cat_append("\t{\n", fname_header) 
   cat_append("\t\tpublic:\n", fname_header)
-  cat_append(paste0("\t\t\tstd:array<thor::PFeatures, ", 
+  cat_append(paste0("\t\t\tstd::array<thor::PFeature, ", 
     as.integer(length(content)), "> pFeatures_;\n"), fname_header)
   cat_append("\n", fname_header)
   cat_append(paste0("\t\t\t", instrument_header, "()\n"), fname_header)
@@ -154,16 +154,17 @@ write_config_alpha_helper(fname_features, fname_header,
     str_sofar <- paste0("\t\t\t\tpFeatures_[", as.integer(i - 1), "] = thor::PFeature(new thor::")
     strr <- gsub("_0:[0-9]+$", "", gsub("^Feature_", "", content[i]))
     strr <- gsub("\\)", "\"\\)", gsub("\\(", "\\(\"", gsub("\\|", ",", strr)))
-    header_old <- gsub("^[a-zA-Z]+<([0-9]+|,)+>\\(\"(.*)\"\\)$", "\\2", strr)
+    strr <- gsub("<>", "", strr)
+    header_old <- gsub("^[a-zA-Z]+<?([0-9]?|,)+>?\\(\"(.*)\"\\)$", "\\2", strr)
     header_new <- instrument_mapper[[header_old]]
     strr <- gsub(header_old, header_new, strr)
-    str_sofar <- paste(str_sofar, ");\n")
-    cat_append(str_so_far, fname_header)
+    cat_append(paste0(str_sofar, strr, ");\n"), fname_header)
   }
 
   cat_append("\t\t\t}\n", fname_header) 
   cat_append("\t};\n", fname_header) 
-  cat_append("};\n", fname_header) 
+  cat_append("\n", fname_header)
+  cat_append("}\n", fname_header) 
   cat_append("\n", fname_header)
   cat_append("#endif\n", fname_header)
 
