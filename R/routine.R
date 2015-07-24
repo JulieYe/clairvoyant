@@ -137,7 +137,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     if (missing(fname_grid_search)) {
       cat(header)
     } else {
-      cat(header, file = file.path(output_path, fname_grid_search), append = TRUE)
+      cat_append(header,  file.path(output_path, fname_grid_search))
     }
     for (i in seq_len(nrow(par_grid))) {
       param <- list(eta = par_grid[i, "eta"],
@@ -170,7 +170,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
       if (missing(fname_grid_search)) {
         cat(line)
       } else {
-        cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
+        cat_append(line, file.path(output_path, fname_grid_search))
       }
     }
     
@@ -190,7 +190,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     if (missing(fname_grid_search)) {
       cat(line)
     } else {
-      cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
+      cat_append(line, file.path(output_path, fname_grid_search))
     }
     param <- list(eta = eta,
                   max.depth = max_depth, 
@@ -209,7 +209,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     if (missing(fname_grid_search)) {
       cat(header)
     } else {
-      cat(header, file = file.path(output_path, fname_grid_search), append = TRUE)
+      cat_append(header, file.path(output_path, fname_grid_search))
     }
 
     param <- list(eta = eta,
@@ -246,7 +246,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     if (missing(fname_grid_search)) {
       cat(line)
     } else {
-      cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
+      cat_append(line, file.path(output_path, fname_grid_search))
     }
   }
 
@@ -262,7 +262,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     if (missing(fname_grid_search)) {
       cat(line)
     } else {
-      cat(line, file = file.path(output_path, fname_grid_search), append = TRUE)
+      cat_append(line, file.path(output_path, fname_grid_search))
     }
 
     # Save the model in text format.
@@ -277,8 +277,7 @@ evaluate_model <- function(dat_tr, dat_ts, n_trees = 500, eta = 0.01, max_depth 
     names_to_save <- colnames(dat[, !colnames(dat) %in% c("Change")]) 
     unlink(file.path(output_path, fname_feature))
     for (i in seq_along(names_to_save)) {
-      cat(paste0(names_to_save[i], ":", i - 1, "\n"), 
-          file = file.path(output_path, fname_feature), append = TRUE)
+      cat_append(paste0(names_to_save[i], ":", i - 1, "\n"), file.path(output_path, fname_feature))
     }
 
     # Save the unit test data randomly

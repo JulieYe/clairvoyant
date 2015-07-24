@@ -6,26 +6,29 @@
 #' @param fname_features character. The name of the raw features file.
 #' @param fname_rds_x character. RDS file name of test data set (features).
 #' @param fname_rds_y character. RDS file name of test data set (response).
-#' @param output_path character. The path to output directory.
-#' @param fname_tree_prefix character. The prefix path of the config files of trees.
-#' @param fname_features_effective character. The name of the effective features file.
 #' @param fname_test_x character. The name of test data set (features).
 #' @param fname_test_y character. The name of test data set (response).
+#' @param fname_features_effective character. The name of the effective features file.
+#' @param output_path character. The path to output directory.
+#' @param fname_tree_prefix character. The prefix path of the config files of trees.
+#' @param fname_features_header character. The absolute file name of features header.
 #' @export
-write_config_xgboost <- function(input_path, fname_model = "xgboost.model", 
-  fname_features = "xgboost.features", fname_rds_x = "tree.input.rds", 
-  fname_rds_y = "tree.output.rds", output_path, fname_tree_prefix = "trees/tree",  
+write_config_xgboost <- function(input_path, 
+  fname_model = "xgboost.model", fname_features = "xgboost.features", 
+  fname_rds_x = "tree.input.rds", fname_rds_y = "tree.output.rds",
+  fname_test_x = "tree.input", fname_test_y = "tree.output",
   fname_features_effective = "xgboost.features.in.use",
-  fname_test_x = "tree.input", fname_test_y = "tree.output") {
+  output_path, fname_tree_prefix = "trees/tree",  
+  fname_features_header) {
 
   fname_model <- file.path(input_path, fname_model)
   fname_features <- file.path(input_path, fname_features)
   fname_rds_x <- file.path(input_path, fname_rds_x)
   fname_rds_y <- file.path(input_path, fname_rds_y)
+  fname_test_x <- file.path(input_path, fname_test_x)
+  fname_test_y <- file.path(input_path, fname_test_y)
+  fname_features_effective <- file.path(input_path, fname_features_effective)
   fname_tree_prefix <- file.path(output_path, fname_tree_prefix)
-  fname_features_effective <- file.path(output_path, fname_features_effective)
-  fname_test_x <- file.path(output_path, fname_test_x)
-  fname_test_y <- file.path(output_path, fname_test_y)
 
   if (!all(file.exists(input_path, fname_model, fname_features, 
           fname_rds_x, fname_rds_y, output_path))) {
@@ -70,8 +73,7 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
     }
     split_value <- as.character(bound_minmax(as.numeric(split_value), float_bounds))
     # Write to config.
-    cat(paste0(paste(node, feature, split_value, left_child, sep = ","), "\n"), 
-      file = filename_tree, append = TRUE)
+    cat_append(paste0(paste(node, feature, split_value, left_child, sep = ","), "\n"), filename_tree)
     # Append to feature indices set.
     if (!as.integer(feature) %in% features) {
       features <- sort(c(features, as.integer(feature)))
@@ -82,7 +84,7 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
   unlink(fname_features_effective)
   for (line in content_features) {
     if (as.integer(strsplit(line, ":")[[1]][2]) %in% features) {
-      cat(paste0(line, "\n"), file = fname_features_effective, append = TRUE)
+      cat_append(paste0(line, "\n"), fname_features_effective)
     }
   }
 
@@ -94,6 +96,76 @@ write_config_xgboost <- function(input_path, fname_model = "xgboost.model",
 
   cleanup_config_xgboost(dir_trees, fname_features_effective, features,
     fname_rds_x, fname_rds_y, fname_test_x, fname_test_y)
+
+  TRUE
+}
+
+#' Write config alpha file
+#' @param fname_features character. The name of the effective features file.
+#' @param output_path character. The path to output directory.
+#' @param instrument_header character. Ticker head of isntrument.
+#' @param instrument_mapper list. The map between instruments.
+#' @export
+write_config_alpha <- function(fname_features_effective, output_path,
+  instrument_header, instrument_mapper) {
+
+  if (!all(file.exists(fname_features_effective, output_path))) {
+    cat("Config files or paths do not exist\n")
+    return(False)
+  }
+
+  fname_header <- file.path(output_path, paste0(instrument_header, ".h"))
+  unlink(fname_header)
+
+  write_config_alpha_helper(fname_features, fname_header, instrument_header, instrument_mapper) 
+}
+
+# Ugly tedious hack.
+write_config_alpha_helper(fname_features, fname_header, 
+  instrument_header, instrument_mapper) {
+
+  content <- readLines(fname_features)
+  num_features <- length(content)
+  cat_append(paste0("#ifndef ", instrument_header, "_H\n", fname_header)
+  cat_append(paste0("#define ", instrument_header, "_H\n", file = fname_header)
+  cat_append("\n", fname_header)
+  cat_append("#include <array>\n", fname_header)
+  cat_append("\n", fname_header)
+  cat_append("#include \"Feature.h\"\n", fname_header)
+  cat_append("\n", fname_header)
+  cat_append("namespace thor\n", fname_header)
+  cat_append("{\n", fname_header) 
+  cat_append("\n", fname_header)
+  cat_append("\ttemplate<bool COMPILE>\n", fname_header)
+  cat_append(paste0("\tclass ", instrument_header, ";\n"), fname_header)
+  cat_append("\n", fname_header)
+  cat_append("\ttemplate<>\n", fname_header)
+  cat_append(paste0("\tclass ", instrument_header, "<true>\n"), fname_header)
+  cat_append("\t{\n", fname_header) 
+  cat_append("\t\tpublic:\n", fname_header)
+  cat_append(paste0("\t\t\tstd:array<thor::PFeatures, ", 
+    as.integer(length(content)), "> pFeatures_;\n"), fname_header)
+  cat_append("\n", fname_header)
+  cat_append(paste0("\t\t\t", instrument_header, "()\n"), fname_header)
+  cat_append("\t\t\t{\n", fname_header) 
+
+  # Convert the features config file.
+  for (i in seq_along(content)) {
+    str_sofar <- paste0("\t\t\t\tpFeatures_[", as.integer(i - 1), "] = thor::PFeature(new thor::")
+    strr <- gsub("_0:[0-9]+$", "", gsub("^Feature_", "", content[i]))
+    strr <- gsub("\\)", "\"\\)", gsub("\\(", "\\(\"", gsub("\\|", ",", strr)))
+    header_old <- gsub("^[a-zA-Z]+<([0-9]+|,)+>\\(\"(.*)\"\\)$", "\\2", strr)
+    header_new <- instrument_mapper[[header_old]]
+    strr <- gsub(header_old, header_new, strr)
+    str_sofar <- paste(str_sofar, ");\n")
+    cat_append(str_so_far, fname_header)
+  }
+
+  cat_append("\t\t\t}\n", fname_header) 
+  cat_append("\t};\n", fname_header) 
+  cat_append("};\n", fname_header) 
+  cat_append("\n", fname_header)
+  cat_append("#endif\n", fname_header)
 
   TRUE
 }
@@ -173,4 +245,8 @@ dual_scale_plot <- function(df, x = 'index', y1, y2, filepath ) {
   mtext(y2_text, side = 4, line = -1)
   legend("topleft", col =c("red", "blue"), lty = 1, legend = c(y1_text, y2_text))
   if(!missing(filepath)) dev.off()
+}
+
+cat_append <- function(str, filename) {
+  cat(str, file = filename, append = TRUE)
 }
