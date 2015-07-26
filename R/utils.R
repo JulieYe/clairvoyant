@@ -11,15 +11,13 @@
 #' @param fname_features_effective character. The name of the effective features file.
 #' @param output_path character. The path to output directory.
 #' @param fname_tree_prefix character. The prefix path of the config files of trees.
-#' @param fname_features_header character. The absolute file name of features header.
 #' @export
 write_config_xgboost <- function(input_path, 
   fname_model = "xgboost.model", fname_features = "xgboost.features", 
   fname_rds_x = "tree.input.rds", fname_rds_y = "tree.output.rds",
   fname_test_x = "tree.input", fname_test_y = "tree.output",
   fname_features_effective = "xgboost.features.in.use",
-  output_path, fname_tree_prefix = "trees/tree",  
-  fname_features_header) {
+  output_path, fname_tree_prefix = "trees/tree") {
 
   fname_model <- file.path(input_path, fname_model)
   fname_features <- file.path(input_path, fname_features)
