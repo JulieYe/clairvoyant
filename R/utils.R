@@ -101,7 +101,7 @@ write_config_xgboost <- function(input_path,
 #' Write config alpha file
 #' @param fname_features character. The name of the effective features file.
 #' @param output_path character. The path to output directory.
-#' @param instrument_header character. Ticker head of isntrument.
+#' @param instrument_header character. Ticker head of instrument.
 #' @param instrument_mapper list. The map between instruments.
 #' @export
 write_config_alpha <- function(fname_features, output_path,

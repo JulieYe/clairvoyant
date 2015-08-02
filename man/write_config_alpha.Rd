@@ -12,7 +12,7 @@ write_config_alpha(fname_features, output_path, instrument_header,
 
 \item{output_path}{character. The path to output directory.}
 
-\item{instrument_header}{character. Ticker head of isntrument.}
+\item{instrument_header}{character. Ticker head of instrument.}
 
 \item{instrument_mapper}{list. The map between instruments.}
 }
